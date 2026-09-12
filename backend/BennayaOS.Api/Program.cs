@@ -20,7 +20,11 @@ if (string.IsNullOrWhiteSpace(connectionString))
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString)
+           // Maps ContractValue -> contract_value, ProjectTasks -> project_tasks.
+           // Keeps the PostgreSQL schema idiomatic so hand-written SQL does not
+           // need double quotes around every identifier.
+           .UseSnakeCaseNamingConvention());
 
 // ---------------------------------------------------------------------------
 // 2. CORS
