@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using BennayaOS.Api.Data;
 using BennayaOS.Api.Extensions;
 using BennayaOS.Api.Middleware;
@@ -61,6 +62,7 @@ builder.Services.Configure<PasswordHasherOptions>(options =>
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 
 // ---------------------------------------------------------------------------
 // 4. Error handling
@@ -90,7 +92,14 @@ builder.Services.AddCors(options =>
 // ---------------------------------------------------------------------------
 // 6. MVC controllers + OpenAPI document
 // ---------------------------------------------------------------------------
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Serialize enums as their names ("Active") rather than integers (1).
+        // The frontend then works with readable values, and reordering the enum
+        // cannot silently change what an API response means.
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddOpenApiWithAuth();
 
 var app = builder.Build();

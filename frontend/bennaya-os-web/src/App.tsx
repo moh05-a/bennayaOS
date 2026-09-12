@@ -7,6 +7,9 @@ import { RegisterPage } from './pages/RegisterPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
 import { ClientsPage } from './pages/clients/ClientsPage'
+import { ProjectsPage } from './pages/projects/ProjectsPage'
+import { ProjectFormPage } from './pages/projects/ProjectFormPage'
+import { ProjectDetailPage } from './pages/projects/ProjectDetailPage'
 
 function App() {
   return (
@@ -24,10 +27,12 @@ function App() {
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/clients" element={<ClientsPage />} />
-              <Route
-                path="/projects"
-                element={<PlaceholderPage title="Projects" phase="Phase 5" />}
-              />
+              <Route path="/projects" element={<ProjectsPage />} />
+              {/* "/projects/new" must come BEFORE "/projects/:id", or the
+                  router would match "new" as an id. */}
+              <Route path="/projects/new" element={<ProjectFormPage />} />
+              <Route path="/projects/:id" element={<ProjectDetailPage />} />
+              <Route path="/projects/:id/edit" element={<ProjectFormPage />} />
               <Route
                 path="/suppliers"
                 element={<PlaceholderPage title="Suppliers" phase="Phase 10" />}
