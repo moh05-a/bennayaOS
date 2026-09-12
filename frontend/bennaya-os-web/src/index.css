@@ -1,0 +1,11 @@
+/* Tailwind v4: one import replaces the old @tailwind base/components/utilities. */
+@import "tailwindcss";
+
+/*
+  Design tokens for BennayaOS.
+  Defining them here (instead of scattering hex codes through components)
+  means rebranding later is a change to this file only.
+*/
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
