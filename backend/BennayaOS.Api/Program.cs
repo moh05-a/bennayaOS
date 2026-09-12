@@ -60,6 +60,7 @@ builder.Services.Configure<PasswordHasherOptions>(options =>
 // ---------------------------------------------------------------------------
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IClientService, ClientService>();
 
 // ---------------------------------------------------------------------------
 // 4. Error handling

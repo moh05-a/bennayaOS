@@ -1,23 +1,43 @@
+import { authStorage } from './authStorage'
+import type { ProblemDetails } from '../types/api'
+
 /**
- * Centralized API client.
- *
- * Every network call in the app goes through here. That gives us ONE place to
- * change the base URL, attach the JWT (Phase 3), and normalize error handling.
+ * Centralized API client. Every network call goes through here, which gives us
+ * one place to attach the JWT, parse errors, and react to an expired session.
  * No component should ever call fetch() directly.
  */
 
 const API_BASE_URL = import.meta.env.VITE_API_URL
 
-/** Thrown for any non-2xx response, so callers can try/catch instead of checking res.ok. */
+/** Called when the server rejects our token, so the app can log the user out. */
+type UnauthorizedHandler = () => void
+let onUnauthorized: UnauthorizedHandler | null = null
+
+export function setUnauthorizedHandler(handler: UnauthorizedHandler): void {
+  onUnauthorized = handler
+}
+
 export class ApiError extends Error {
   readonly status: number
-  readonly body: unknown
+  readonly problem: ProblemDetails | null
 
-  constructor(status: number, message: string, body: unknown) {
+  constructor(status: number, message: string, problem: ProblemDetails | null) {
     super(message)
     this.name = 'ApiError'
     this.status = status
-    this.body = body
+    this.problem = problem
+  }
+
+  /** Field-level validation errors, keyed by lower-cased field name. */
+  get fieldErrors(): Record<string, string> {
+    const errors = this.problem?.errors
+    if (!errors) return {}
+
+    return Object.entries(errors).reduce<Record<string, string>>((acc, [field, messages]) => {
+      const first = messages[0]
+      if (first) acc[field.toLowerCase()] = first
+      return acc
+    }, {})
   }
 }
 
@@ -34,10 +54,11 @@ async function request<TResponse>(
   const { method = 'GET', body, signal } = options
 
   const headers: Record<string, string> = {}
-  if (body !== undefined) {
-    headers['Content-Type'] = 'application/json'
-  }
-  // Phase 3 will add: headers.Authorization = `Bearer ${token}`
+  if (body !== undefined) headers['Content-Type'] = 'application/json'
+
+  // Attached here once, so no component ever handles the token itself.
+  const session = authStorage.read()
+  if (session) headers.Authorization = `Bearer ${session.token}`
 
   let response: Response
   try {
@@ -49,15 +70,26 @@ async function request<TResponse>(
     })
   } catch (cause) {
     // fetch only rejects on network-level failures (server down, DNS, CORS).
-    throw new ApiError(0, 'Cannot reach the server. Is the API running?', cause)
+    throw new ApiError(0, 'Cannot reach the server. Is the API running?', null)
   }
 
-  // 204 No Content has an empty body - parsing it as JSON would throw.
-  const hasJson = response.headers.get('content-type')?.includes('application/json')
-  const payload: unknown = hasJson ? await response.json() : null
+  // 401 means the token is missing, expired or invalid. Handled centrally so
+  // every screen logs out consistently instead of showing its own broken state.
+  if (response.status === 401) {
+    onUnauthorized?.()
+    throw new ApiError(401, 'Your session has expired. Please sign in again.', null)
+  }
+
+  const isJson = response.headers.get('content-type')?.includes('json')
+  const payload: unknown = isJson ? await response.json() : null
 
   if (!response.ok) {
-    throw new ApiError(response.status, `Request failed (${response.status})`, payload)
+    const problem = payload as ProblemDetails | null
+    throw new ApiError(
+      response.status,
+      problem?.title ?? `Request failed (${response.status})`,
+      problem,
+    )
   }
 
   return payload as TResponse
@@ -65,7 +97,7 @@ async function request<TResponse>(
 
 export const api = {
   get: <T>(path: string, signal?: AbortSignal) => request<T>(path, { method: 'GET', signal }),
-  post: <T>(path: string, body: unknown) => request<T>(path, { method: 'POST', body }),
-  put: <T>(path: string, body: unknown) => request<T>(path, { method: 'PUT', body }),
-  delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
+  post: <T>(path: string, body?: unknown) => request<T>(path, { method: 'POST', body }),
+  put: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PUT', body }),
+  delete: <T = void>(path: string) => request<T>(path, { method: 'DELETE' }),
 }
