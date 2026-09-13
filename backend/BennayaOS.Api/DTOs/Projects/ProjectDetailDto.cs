@@ -43,6 +43,16 @@ public class ProjectDetailDto
     /// </summary>
     public required decimal RemainingContractValue { get; init; }
 
+    /// <summary>
+    /// TotalReceived - TotalExpenses: the actual cash this project has
+    /// generated or consumed so far.
+    ///
+    /// This is the one honest "health" number we can compute today. It is NOT
+    /// profit - it ignores work done but not yet invoiced, and costs committed
+    /// but not yet paid - but unlike profit it needs no data we do not have.
+    /// </summary>
+    public required decimal NetCashPosition { get; init; }
+
     /// <summary>Lets the UI warn what a project deletion takes with it.</summary>
     public required int ExpenseCount { get; init; }
     public required int PaymentCount { get; init; }

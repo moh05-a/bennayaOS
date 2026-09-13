@@ -18,5 +18,14 @@ public class ProjectDto
     public required Guid ClientId { get; init; }
     public required string ClientName { get; init; }
 
+    /// <summary>
+    /// Money figures on the list row as well, so a contractor can scan the
+    /// health of every job without opening each one. These are SQL subqueries
+    /// over indexed columns, not extra round trips.
+    /// </summary>
+    public required decimal TotalExpenses { get; init; }
+    public required decimal TotalReceived { get; init; }
+    public required decimal OutstandingBalance { get; init; }
+
     public required DateTimeOffset CreatedAt { get; init; }
 }

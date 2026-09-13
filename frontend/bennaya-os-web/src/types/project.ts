@@ -20,20 +20,20 @@ export interface Project {
   status: ProjectStatus
   clientId: string
   clientName: string
+  /** Money figures on list rows, so health is visible without opening a project. */
+  totalExpenses: number
+  totalReceived: number
+  outstandingBalance: number
   createdAt: string
 }
 
 export interface ProjectDetail extends Project {
   description: string | null
   clientPhone: string | null
-  /** SUM of all expenses, computed by the database. */
-  totalExpenses: number
-  /** SUM of all client payments received. */
-  totalReceived: number
-  /** contractValue - totalReceived. Negative means the client overpaid. */
-  outstandingBalance: number
   /** contractValue - totalExpenses. Deliberately NOT called profit. */
   remainingContractValue: number
+  /** totalReceived - totalExpenses. Real cash, not profit. */
+  netCashPosition: number
   /** Used to warn how much a project deletion will take with it. */
   expenseCount: number
   paymentCount: number

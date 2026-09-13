@@ -9,7 +9,6 @@ import { StatusBadge } from '../../components/ui/StatusBadge'
 import { projectsApi } from '../../services/projectsApi'
 import { ApiError } from '../../services/api'
 import { useCurrency } from '../../hooks/useCurrency'
-import { formatDate } from '../../utils/format'
 
 export function ProjectsPage() {
   const navigate = useNavigate()
@@ -65,6 +64,27 @@ export function ProjectsPage() {
                     {format(project.contractValue)}
                   </p>
 
+                  <div className="mt-2 flex gap-4 text-xs">
+                    <span className="text-slate-500">
+                      Received{' '}
+                      <span className="font-medium tabular-nums text-emerald-700">
+                        {format(project.totalReceived)}
+                      </span>
+                    </span>
+                    <span className="text-slate-500">
+                      Spent{' '}
+                      <span
+                        className={`font-medium tabular-nums ${
+                          project.totalExpenses > project.contractValue
+                            ? 'text-red-700'
+                            : 'text-slate-700'
+                        }`}
+                      >
+                        {format(project.totalExpenses)}
+                      </span>
+                    </span>
+                  </div>
+
                   {project.location && (
                     <p className="mt-1 truncate text-xs text-slate-500">{project.location}</p>
                   )}
@@ -82,8 +102,9 @@ export function ProjectsPage() {
                   <th className="px-4 py-3 font-medium">Client</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 text-right font-medium">Contract value</th>
-                  <th className="px-4 py-3 font-medium">Start</th>
-                  <th className="px-4 py-3 font-medium">Expected end</th>
+                  <th className="px-4 py-3 text-right font-medium">Received</th>
+                  <th className="px-4 py-3 text-right font-medium">Spent</th>
+                  <th className="px-4 py-3 text-right font-medium">Outstanding</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -114,9 +135,20 @@ export function ProjectsPage() {
                     <td className="px-4 py-3 text-right font-medium tabular-nums text-slate-900">
                       {format(project.contractValue)}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{formatDate(project.startDate)}</td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {formatDate(project.expectedEndDate)}
+                    <td className="px-4 py-3 text-right tabular-nums text-emerald-700">
+                      {format(project.totalReceived)}
+                    </td>
+                    <td
+                      className={`px-4 py-3 text-right tabular-nums ${
+                        project.totalExpenses > project.contractValue
+                          ? 'font-medium text-red-700'
+                          : 'text-slate-600'
+                      }`}
+                    >
+                      {format(project.totalExpenses)}
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums text-slate-600">
+                      {format(project.outstandingBalance)}
                     </td>
                   </tr>
                 ))}

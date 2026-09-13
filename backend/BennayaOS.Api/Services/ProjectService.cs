@@ -36,6 +36,10 @@ public class ProjectService : IProjectService
                 ClientId = p.ClientId,
                 // Becomes a SQL JOIN, not a second round trip per row.
                 ClientName = p.Client.Name,
+                TotalExpenses = p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m,
+                TotalReceived = p.ClientPayments.Sum(cp => (decimal?)cp.Amount) ?? 0m,
+                OutstandingBalance =
+                    p.ContractValue - (p.ClientPayments.Sum(cp => (decimal?)cp.Amount) ?? 0m),
                 CreatedAt = p.CreatedAt,
             })
             .ToListAsync(cancellationToken);
@@ -153,6 +157,9 @@ public class ProjectService : IProjectService
                 p.ContractValue - (p.ClientPayments.Sum(cp => (decimal?)cp.Amount) ?? 0m),
             RemainingContractValue =
                 p.ContractValue - (p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m),
+            NetCashPosition =
+                (p.ClientPayments.Sum(cp => (decimal?)cp.Amount) ?? 0m)
+                - (p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m),
             ExpenseCount = p.Expenses.Count(),
             PaymentCount = p.ClientPayments.Count(),
             CreatedAt = p.CreatedAt,

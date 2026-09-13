@@ -11,6 +11,7 @@ import { ApiError } from '../../services/api'
 import { useCurrency } from '../../hooks/useCurrency'
 import { formatDate } from '../../utils/format'
 import { ExpensesTab } from './ExpensesTab'
+import { OverviewTab } from './OverviewTab'
 import { PaymentsTab } from './PaymentsTab'
 
 /** Tabs are declared here; each one lights up as its phase lands. */
@@ -123,21 +124,13 @@ export function ProjectDetailPage() {
           </div>
         </div>
 
-        <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-slate-100 pt-5 sm:grid-cols-4">
+        <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-slate-100 pt-5 sm:grid-cols-3">
           <div>
             <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
               Contract value
             </dt>
             <dd className="mt-1 text-lg font-semibold tabular-nums text-slate-900">
               {format(project.contractValue)}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Spent
-            </dt>
-            <dd className="mt-1 text-lg font-semibold tabular-nums text-slate-900">
-              {format(project.totalExpenses)}
             </dd>
           </div>
           <div>
@@ -179,27 +172,7 @@ export function ProjectDetailPage() {
         ) : activeTab === 'payments' ? (
           <PaymentsTab projectId={project.id} />
         ) : activeTab === 'overview' ? (
-          <div className="space-y-4">
-            {project.description ? (
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h2 className="text-sm font-semibold text-slate-900">Description</h2>
-                <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">
-                  {project.description}
-                </p>
-              </div>
-            ) : (
-              <div className="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-8 text-center">
-                <p className="text-sm text-slate-500">No description yet.</p>
-              </div>
-            )}
-
-            <div className="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-8 text-center">
-              <h3 className="text-sm font-semibold text-slate-900">Financial summary</h3>
-              <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">
-                Received and outstanding join Spent here once client payments exist (Phase 7).
-              </p>
-            </div>
-          </div>
+          <OverviewTab project={project} />
         ) : (
           <div className="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
             <p className="text-sm text-slate-500">
