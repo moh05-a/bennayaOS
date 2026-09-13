@@ -58,6 +58,13 @@ public class DashboardService : IDashboardService
             .Where(e => e.Project.Status != ProjectStatus.Cancelled)
             .SumAsync(e => (decimal?)e.Amount, cancellationToken) ?? 0m;
 
+        // Subcontractor payments are money out of the business too. Omitting
+        // them would overstate the net cash position across every project.
+        var totalSubcontractorPaid = await _db.SubcontractorPayments
+            .AsNoTracking()
+            .Where(p => p.Subcontractor.Project.Status != ProjectStatus.Cancelled)
+            .SumAsync(p => (decimal?)p.Amount, cancellationToken) ?? 0m;
+
         var totalReceived = await _db.ClientPayments
             .AsNoTracking()
             .Where(p => p.Project.Status != ProjectStatus.Cancelled)
@@ -107,9 +114,9 @@ public class DashboardService : IDashboardService
             TotalProjects = totalProjects,
             TotalContractValue = totalContractValue,
             TotalReceived = totalReceived,
-            TotalExpenses = totalExpenses,
+            TotalExpenses = totalExpenses + totalSubcontractorPaid,
             TotalOutstanding = totalContractValue - totalReceived,
-            NetCashPosition = totalReceived - totalExpenses,
+            NetCashPosition = totalReceived - totalExpenses - totalSubcontractorPaid,
             ProjectsOverBudget = projectsOverBudget,
             ProjectsByStatus = statusCounts
                 .OrderByDescending(entry => entry.Count)

@@ -153,15 +153,33 @@ public class ProjectService : IProjectService
             // loaded into memory and added up in C#.
             TotalExpenses = p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m,
             TotalReceived = p.ClientPayments.Sum(cp => (decimal?)cp.Amount) ?? 0m,
+            TotalSubcontractorCommitted =
+                p.Subcontractors.Sum(sc => (decimal?)sc.ContractAmount) ?? 0m,
+            TotalSubcontractorPaid =
+                p.Subcontractors.Sum(sc => (decimal?)sc.Payments.Sum(pay => (decimal?)pay.Amount)) ?? 0m,
+            TotalSubcontractorRemaining =
+                (p.Subcontractors.Sum(sc => (decimal?)sc.ContractAmount) ?? 0m)
+                - (p.Subcontractors.Sum(sc => (decimal?)sc.Payments.Sum(pay => (decimal?)pay.Amount)) ?? 0m),
+            TotalSpent =
+                (p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m)
+                + (p.Subcontractors.Sum(sc => (decimal?)sc.Payments.Sum(pay => (decimal?)pay.Amount)) ?? 0m),
             OutstandingBalance =
                 p.ContractValue - (p.ClientPayments.Sum(cp => (decimal?)cp.Amount) ?? 0m),
             RemainingContractValue =
-                p.ContractValue - (p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m),
+                p.ContractValue
+                - (p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m)
+                - (p.Subcontractors.Sum(sc => (decimal?)sc.Payments.Sum(pay => (decimal?)pay.Amount)) ?? 0m),
+            ProjectedMargin =
+                p.ContractValue
+                - (p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m)
+                - (p.Subcontractors.Sum(sc => (decimal?)sc.ContractAmount) ?? 0m),
             NetCashPosition =
                 (p.ClientPayments.Sum(cp => (decimal?)cp.Amount) ?? 0m)
-                - (p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m),
+                - (p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m)
+                - (p.Subcontractors.Sum(sc => (decimal?)sc.Payments.Sum(pay => (decimal?)pay.Amount)) ?? 0m),
             ExpenseCount = p.Expenses.Count(),
             PaymentCount = p.ClientPayments.Count(),
+            SubcontractorCount = p.Subcontractors.Count(),
             CreatedAt = p.CreatedAt,
         };
 

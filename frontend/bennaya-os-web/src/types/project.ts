@@ -30,13 +30,24 @@ export interface Project {
 export interface ProjectDetail extends Project {
   description: string | null
   clientPhone: string | null
-  /** contractValue - totalExpenses. Deliberately NOT called profit. */
+  /** Sum of all subcontract amounts agreed. */
+  totalSubcontractorCommitted: number
+  /** Sum actually paid out to subcontractors. */
+  totalSubcontractorPaid: number
+  /** Committed minus paid: a real liability a cash balance alone would hide. */
+  totalSubcontractorRemaining: number
+  /** totalExpenses + totalSubcontractorPaid: everything that left the business. */
+  totalSpent: number
+  /** contractValue - totalSpent. Deliberately NOT called profit. */
   remainingContractValue: number
-  /** totalReceived - totalExpenses. Real cash, not profit. */
+  /** contractValue - totalSpent - subcontractorRemaining. A ceiling, not a promise. */
+  projectedMargin: number
+  /** totalReceived - totalSpent. Real cash, not profit. */
   netCashPosition: number
   /** Used to warn how much a project deletion will take with it. */
   expenseCount: number
   paymentCount: number
+  subcontractorCount: number
 }
 
 export interface ProjectInput {

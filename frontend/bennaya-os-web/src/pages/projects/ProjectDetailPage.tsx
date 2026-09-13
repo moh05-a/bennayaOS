@@ -13,6 +13,7 @@ import { formatDate } from '../../utils/format'
 import { ExpensesTab } from './ExpensesTab'
 import { OverviewTab } from './OverviewTab'
 import { PaymentsTab } from './PaymentsTab'
+import { SubcontractorsTab } from './SubcontractorsTab'
 
 /** Tabs are declared here; each one lights up as its phase lands. */
 const TABS = [
@@ -20,7 +21,7 @@ const TABS = [
   { id: 'overview', label: 'Overview', phase: null },
   { id: 'expenses', label: 'Expenses', phase: null },
   { id: 'payments', label: 'Payments', phase: null },
-  { id: 'subcontractors', label: 'Subcontractors', phase: 'Phase 11' },
+  { id: 'subcontractors', label: 'Subcontractors', phase: null },
   { id: 'materials', label: 'Materials', phase: 'Phase 13' },
   { id: 'tasks', label: 'Tasks', phase: 'Phase 12' },
 ] as const
@@ -172,6 +173,8 @@ export function ProjectDetailPage() {
           <ExpensesTab projectId={project.id} />
         ) : activeTab === 'payments' ? (
           <PaymentsTab projectId={project.id} />
+        ) : activeTab === 'subcontractors' ? (
+          <SubcontractorsTab projectId={project.id} />
         ) : activeTab === 'overview' ? (
           <OverviewTab project={project} />
         ) : (
@@ -188,8 +191,8 @@ export function ProjectDetailPage() {
         title="Delete project"
         message={
           deleteError ??
-          (project.expenseCount > 0 || project.paymentCount > 0
-            ? `Delete "${project.name}"? This also deletes ${project.expenseCount} expense(s) and ${project.paymentCount} payment(s). This cannot be undone.`
+          (project.expenseCount > 0 || project.paymentCount > 0 || project.subcontractorCount > 0
+            ? `Delete "${project.name}"? This also deletes ${project.expenseCount} expense(s), ${project.paymentCount} payment(s) and ${project.subcontractorCount} subcontractor(s). This cannot be undone.`
             : `Delete "${project.name}"? This cannot be undone.`)
         }
         isLoading={deleteMutation.isPending}

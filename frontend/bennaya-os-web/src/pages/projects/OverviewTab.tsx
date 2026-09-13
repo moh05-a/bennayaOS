@@ -46,13 +46,13 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
   })
 
   const isOverpaid = project.outstandingBalance < 0
-  const isOverBudget = project.totalExpenses > project.contractValue
+  const isOverBudget = project.totalSpent > project.contractValue
   const cashIsNegative = project.netCashPosition < 0
 
   const collectedPercent =
     project.contractValue > 0 ? (project.totalReceived / project.contractValue) * 100 : 0
   const spentPercent =
-    project.contractValue > 0 ? (project.totalExpenses / project.contractValue) * 100 : 0
+    project.contractValue > 0 ? (project.totalSpent / project.contractValue) * 100 : 0
 
   // Merge both money streams into one dated timeline, newest first.
   const recentActivity = [
@@ -84,7 +84,12 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
         <StatCard label="Received" value={format(project.totalReceived)} tone="positive" />
         <StatCard
           label="Spent"
-          value={format(project.totalExpenses)}
+          value={format(project.totalSpent)}
+          hint={
+            project.totalSubcontractorPaid > 0
+              ? `incl. ${format(project.totalSubcontractorPaid)} to subcontractors`
+              : undefined
+          }
           tone={isOverBudget ? 'warning' : 'default'}
         />
         <StatCard
@@ -122,6 +127,28 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
           )}
         </div>
 
+        {project.totalSubcontractorRemaining > 0 && (
+          <div className="mt-4 rounded-lg bg-slate-50 px-3 py-2.5">
+            <p className="text-xs text-slate-600">
+              Still owed to subcontractors:{' '}
+              <span className="font-semibold tabular-nums text-slate-900">
+                {format(project.totalSubcontractorRemaining)}
+              </span>
+            </p>
+            <p className="mt-0.5 text-xs text-slate-500">
+              Projected margin after that commitment:{' '}
+              <span
+                className={`font-semibold tabular-nums ${
+                  project.projectedMargin < 0 ? 'text-red-700' : 'text-slate-900'
+                }`}
+              >
+                {format(project.projectedMargin)}
+              </span>{' '}
+              &mdash; a ceiling, since further materials and labour are not yet recorded.
+            </p>
+          </div>
+        )}
+
         <div className="mt-5 space-y-3 border-t border-slate-100 pt-4">
           <ProgressBar
             label="Collected from client"
@@ -137,9 +164,9 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
 
         {isOverBudget && (
           <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
-            Direct costs have exceeded the contract value by{' '}
-            {format(project.totalExpenses - project.contractValue)}. This project is losing
-            money on costs alone.
+            Costs have exceeded the contract value by{' '}
+            {format(project.totalSpent - project.contractValue)}. This project is losing money
+            on costs alone.
           </p>
         )}
       </div>

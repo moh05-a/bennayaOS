@@ -12,6 +12,7 @@ import type { QueryClient } from '@tanstack/react-query'
 export function invalidateProjectFinancials(queryClient: QueryClient, projectId: string): void {
   void queryClient.invalidateQueries({ queryKey: ['expenses', projectId] })
   void queryClient.invalidateQueries({ queryKey: ['payments', projectId] })
+  void queryClient.invalidateQueries({ queryKey: ['subcontractors', projectId] })
   void queryClient.invalidateQueries({ queryKey: ['projects'] })
   void queryClient.invalidateQueries({ queryKey: ['dashboard'] })
 }
