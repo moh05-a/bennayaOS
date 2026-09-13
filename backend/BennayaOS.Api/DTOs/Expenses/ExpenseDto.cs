@@ -10,5 +10,9 @@ public class ExpenseDto
     public required ExpenseCategory Category { get; init; }
     public required DateOnly Date { get; init; }
     public required Guid ProjectId { get; init; }
+
+    /// <summary>Null when the expense has no supplier, which is common and fine.</summary>
+    public Guid? SupplierId { get; init; }
+    public string? SupplierName { get; init; }
     public required DateTimeOffset CreatedAt { get; init; }
 }

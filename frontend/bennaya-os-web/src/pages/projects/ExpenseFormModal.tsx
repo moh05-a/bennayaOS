@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '../../components/ui/Button'
 import { ErrorMessage } from '../../components/ui/ErrorMessage'
 import { Input } from '../../components/ui/Input'
 import { Modal } from '../../components/ui/Modal'
 import { Select } from '../../components/ui/Select'
 import { expensesApi } from '../../services/expensesApi'
+import { suppliersApi } from '../../services/suppliersApi'
 import { ApiError } from '../../services/api'
 import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
@@ -32,9 +33,17 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
     // the day it happened, so that should take zero taps.
     date: todayIsoDate(),
     description: '',
+    supplierId: '',
   })
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
+
+  // Shares the ['suppliers'] cache with the Suppliers page, so this dropdown
+  // is usually populated instantly with no extra request.
+  const { data: suppliers } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: ({ signal }) => suppliersApi.list(signal),
+  })
 
   useEffect(() => {
     if (!isOpen) return
@@ -45,8 +54,15 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
             category: expense.category,
             date: expense.date,
             description: expense.description ?? '',
+            supplierId: expense.supplierId ?? '',
           }
-        : { amount: '', category: 'Materials', date: todayIsoDate(), description: '' },
+        : {
+            amount: '',
+            category: 'Materials',
+            date: todayIsoDate(),
+            description: '',
+            supplierId: '',
+          },
     )
     setFieldErrors({})
     setFormError(null)
@@ -59,6 +75,8 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
         category: values.category,
         date: values.date,
         description: values.description.trim() || null,
+        // "" from the empty <option> must become null, not an empty string.
+        supplierId: values.supplierId || null,
       }
       return expense
         ? expensesApi.update(expense.id, payload)
@@ -126,6 +144,15 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
           value={form.date}
           onChange={update('date')}
           error={fieldErrors.date}
+        />
+
+        <Select
+          label="Supplier (optional)"
+          value={form.supplierId}
+          onChange={update('supplierId')}
+          error={fieldErrors.supplierid}
+          placeholder="No supplier"
+          options={(suppliers ?? []).map((s) => ({ value: s.id, label: s.name }))}
         />
 
         <Input

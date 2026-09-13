@@ -5,8 +5,8 @@ import { AppLayout } from './components/layout/AppLayout'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { DashboardPage } from './pages/DashboardPage'
-import { PlaceholderPage } from './pages/PlaceholderPage'
 import { ClientsPage } from './pages/clients/ClientsPage'
+import { SuppliersPage } from './pages/suppliers/SuppliersPage'
 import { ProjectsPage } from './pages/projects/ProjectsPage'
 import { ProjectFormPage } from './pages/projects/ProjectFormPage'
 import { ProjectDetailPage } from './pages/projects/ProjectDetailPage'
@@ -33,10 +33,7 @@ function App() {
               <Route path="/projects/new" element={<ProjectFormPage />} />
               <Route path="/projects/:id" element={<ProjectDetailPage />} />
               <Route path="/projects/:id/edit" element={<ProjectFormPage />} />
-              <Route
-                path="/suppliers"
-                element={<PlaceholderPage title="Suppliers" phase="Phase 10" />}
-              />
+              <Route path="/suppliers" element={<SuppliersPage />} />
             </Route>
           </Route>
 

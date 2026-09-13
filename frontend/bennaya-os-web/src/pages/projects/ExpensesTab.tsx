@@ -144,6 +144,9 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
                 {expense.description && (
                   <p className="mt-2 text-sm text-slate-600">{expense.description}</p>
                 )}
+                {expense.supplierName && (
+                  <p className="mt-0.5 text-xs text-slate-500">{expense.supplierName}</p>
+                )}
 
                 <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
                   <Button variant="secondary" onClick={() => openEdit(expense)} className="flex-1">
@@ -165,6 +168,7 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
                   <th className="px-4 py-3 font-medium">Date</th>
                   <th className="px-4 py-3 font-medium">Category</th>
                   <th className="px-4 py-3 font-medium">Description</th>
+                  <th className="px-4 py-3 font-medium">Supplier</th>
                   <th className="px-4 py-3 text-right font-medium">Amount</th>
                   <th className="px-4 py-3 text-right font-medium">Actions</th>
                 </tr>
@@ -179,6 +183,7 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
                       <CategoryTag category={expense.category} />
                     </td>
                     <td className="px-4 py-3 text-slate-600">{expense.description ?? '-'}</td>
+                    <td className="px-4 py-3 text-slate-600">{expense.supplierName ?? '-'}</td>
                     <td className="px-4 py-3 text-right font-medium tabular-nums text-slate-900">
                       {format(expense.amount)}
                     </td>
@@ -197,7 +202,7 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
               </tbody>
               <tfoot className="border-t border-slate-200 bg-slate-50">
                 <tr>
-                  <td colSpan={3} className="px-4 py-3 text-sm font-medium text-slate-600">
+                  <td colSpan={4} className="px-4 py-3 text-sm font-medium text-slate-600">
                     Total
                   </td>
                   <td className="px-4 py-3 text-right text-sm font-semibold tabular-nums text-slate-900">

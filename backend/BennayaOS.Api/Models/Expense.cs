@@ -29,7 +29,13 @@ public class Expense : ICompanyOwned
     public Guid ProjectId { get; set; }
     public Project Project { get; set; } = null!;
 
-    // Phase 10 adds: public Guid? SupplierId
+    /// <summary>
+    /// Optional. Plenty of real expenses have no supplier - paying a labour
+    /// crew, hiring equipment from someone with no account. Forcing one would
+    /// make contractors invent fake suppliers to get past the form.
+    /// </summary>
+    public Guid? SupplierId { get; set; }
+    public Supplier? Supplier { get; set; }
 
     /// <summary>
     /// Denormalized from Project so the global tenant filter applies here the

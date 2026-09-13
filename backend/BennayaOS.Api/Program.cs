@@ -66,6 +66,7 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<IClientPaymentService, ClientPaymentService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
 
 // ---------------------------------------------------------------------------
 // 4. Error handling

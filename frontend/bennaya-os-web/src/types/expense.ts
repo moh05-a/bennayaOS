@@ -23,6 +23,9 @@ export interface Expense {
   /** "2026-03-20" - date only, no time. */
   date: string
   projectId: string
+  /** Null when the expense has no supplier, which is normal. */
+  supplierId: string | null
+  supplierName: string | null
   createdAt: string
 }
 
@@ -43,4 +46,5 @@ export interface ExpenseInput {
   description?: string | null
   category: ExpenseCategory
   date: string
+  supplierId?: string | null
 }

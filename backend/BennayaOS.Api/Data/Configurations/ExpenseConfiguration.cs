@@ -31,6 +31,16 @@ public class ExpenseConfiguration : IEntityTypeConfiguration<Expense>
             // project removes them. The UI warns with a count first.
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasOne(e => e.Supplier)
+            .WithMany(supplier => supplier.Expenses)
+            .HasForeignKey(e => e.SupplierId)
+            // SetNull, not Restrict: deleting an old supplier must not require
+            // editing every historical expense first. The expense itself - the
+            // amount, category and date - survives; only the link is cleared.
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(e => e.SupplierId);
+
         // Foreign key to companies WITHOUT a navigation collection on Company.
         // We get referential integrity without Company carrying a list of every
         // expense in the business, which nothing would ever load.

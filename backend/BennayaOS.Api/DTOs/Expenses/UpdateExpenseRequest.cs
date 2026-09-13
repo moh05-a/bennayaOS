@@ -16,4 +16,7 @@ public class UpdateExpenseRequest
 
     [Required(ErrorMessage = "Date is required.")]
     public DateOnly Date { get; set; }
+
+    /// <summary>Optional. Verified to belong to the caller's company server-side.</summary>
+    public Guid? SupplierId { get; set; }
 }
