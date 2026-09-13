@@ -69,6 +69,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<ISubcontractorService, SubcontractorService>();
 builder.Services.AddScoped<IProjectTaskService, ProjectTaskService>();
+builder.Services.AddScoped<IMaterialService, MaterialService>();
 
 // ---------------------------------------------------------------------------
 // 4. Error handling

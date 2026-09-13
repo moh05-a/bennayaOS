@@ -50,6 +50,7 @@ public class Project : ICompanyOwned
     public ICollection<ClientPayment> ClientPayments { get; set; } = [];
     public ICollection<Subcontractor> Subcontractors { get; set; } = [];
     public ICollection<ProjectTask> Tasks { get; set; } = [];
+    public ICollection<Material> Materials { get; set; } = [];
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

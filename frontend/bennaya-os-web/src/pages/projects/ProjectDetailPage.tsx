@@ -15,6 +15,7 @@ import { OverviewTab } from './OverviewTab'
 import { PaymentsTab } from './PaymentsTab'
 import { SubcontractorsTab } from './SubcontractorsTab'
 import { TasksTab } from './TasksTab'
+import { MaterialsTab } from './MaterialsTab'
 
 /** Tabs are declared here; each one lights up as its phase lands. */
 const TABS = [
@@ -23,7 +24,7 @@ const TABS = [
   { id: 'expenses', label: 'Expenses', phase: null },
   { id: 'payments', label: 'Payments', phase: null },
   { id: 'subcontractors', label: 'Subcontractors', phase: null },
-  { id: 'materials', label: 'Materials', phase: 'Phase 13' },
+  { id: 'materials', label: 'Materials', phase: null },
   { id: 'tasks', label: 'Tasks', phase: null },
 ] as const
 
@@ -178,6 +179,8 @@ export function ProjectDetailPage() {
           <SubcontractorsTab projectId={project.id} />
         ) : activeTab === 'tasks' ? (
           <TasksTab projectId={project.id} />
+        ) : activeTab === 'materials' ? (
+          <MaterialsTab projectId={project.id} />
         ) : activeTab === 'overview' ? (
           <OverviewTab project={project} />
         ) : (

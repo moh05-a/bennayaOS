@@ -14,6 +14,7 @@ export function invalidateProjectFinancials(queryClient: QueryClient, projectId:
   void queryClient.invalidateQueries({ queryKey: ['payments', projectId] })
   void queryClient.invalidateQueries({ queryKey: ['subcontractors', projectId] })
   void queryClient.invalidateQueries({ queryKey: ['tasks', projectId] })
+  void queryClient.invalidateQueries({ queryKey: ['materials', projectId] })
   void queryClient.invalidateQueries({ queryKey: ['projects'] })
   void queryClient.invalidateQueries({ queryKey: ['dashboard'] })
 }
