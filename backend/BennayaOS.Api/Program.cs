@@ -63,6 +63,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
 // ---------------------------------------------------------------------------
 // 4. Error handling
@@ -101,6 +102,9 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 builder.Services.AddOpenApiWithAuth();
+
+// Strips internal .NET type names out of automatic 400 responses.
+builder.Services.AddCleanValidationResponses();
 
 var app = builder.Build();
 

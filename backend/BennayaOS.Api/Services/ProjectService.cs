@@ -145,6 +145,10 @@ public class ProjectService : IProjectService
             ClientId = p.ClientId,
             ClientName = p.Client.Name,
             ClientPhone = p.Client.Phone,
+            // Translated into SQL aggregates over the expenses table, not
+            // loaded into memory and added up in C#.
+            TotalExpenses = p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m,
+            ExpenseCount = p.Expenses.Count(),
             CreatedAt = p.CreatedAt,
         };
 

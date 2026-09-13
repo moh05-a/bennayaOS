@@ -10,12 +10,13 @@ import { projectsApi } from '../../services/projectsApi'
 import { ApiError } from '../../services/api'
 import { useCurrency } from '../../hooks/useCurrency'
 import { formatDate } from '../../utils/format'
+import { ExpensesTab } from './ExpensesTab'
 
 /** Tabs are declared here; each one lights up as its phase lands. */
 const TABS = [
   // phase: null means the tab is built and has real content.
   { id: 'overview', label: 'Overview', phase: null },
-  { id: 'expenses', label: 'Expenses', phase: 'Phase 6' },
+  { id: 'expenses', label: 'Expenses', phase: null },
   { id: 'payments', label: 'Payments', phase: 'Phase 7' },
   { id: 'subcontractors', label: 'Subcontractors', phase: 'Phase 11' },
   { id: 'materials', label: 'Materials', phase: 'Phase 13' },
@@ -121,13 +122,21 @@ export function ProjectDetailPage() {
           </div>
         </div>
 
-        <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-slate-100 pt-5 sm:grid-cols-3">
+        <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-slate-100 pt-5 sm:grid-cols-4">
           <div>
             <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
               Contract value
             </dt>
             <dd className="mt-1 text-lg font-semibold tabular-nums text-slate-900">
               {format(project.contractValue)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              Spent
+            </dt>
+            <dd className="mt-1 text-lg font-semibold tabular-nums text-slate-900">
+              {format(project.totalExpenses)}
             </dd>
           </div>
           <div>
@@ -164,7 +173,9 @@ export function ProjectDetailPage() {
       </div>
 
       <div className="mt-5">
-        {activeTab === 'overview' ? (
+        {activeTab === 'expenses' ? (
+          <ExpensesTab projectId={project.id} />
+        ) : activeTab === 'overview' ? (
           <div className="space-y-4">
             {project.description ? (
               <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -182,8 +193,7 @@ export function ProjectDetailPage() {
             <div className="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-8 text-center">
               <h3 className="text-sm font-semibold text-slate-900">Financial summary</h3>
               <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">
-                Received, spent and outstanding appear here once expenses (Phase 6) and client
-                payments (Phase 7) exist. Showing zeros before then would be misleading.
+                Received and outstanding join Spent here once client payments exist (Phase 7).
               </p>
             </div>
           </div>
@@ -199,7 +209,12 @@ export function ProjectDetailPage() {
       <ConfirmDialog
         isOpen={isConfirmingDelete}
         title="Delete project"
-        message={deleteError ?? `Delete "${project.name}"? This cannot be undone.`}
+        message={
+          deleteError ??
+          (project.expenseCount > 0
+            ? `Delete "${project.name}"? This also deletes ${project.expenseCount} expense(s) worth ${format(project.totalExpenses)}. This cannot be undone.`
+            : `Delete "${project.name}"? This cannot be undone.`)
+        }
         isLoading={deleteMutation.isPending}
         onConfirm={() => deleteMutation.mutate()}
         onCancel={() => {

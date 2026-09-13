@@ -46,5 +46,7 @@ public class Project : ICompanyOwned
     public Guid CompanyId { get; set; }
     public Company Company { get; set; } = null!;
 
+    public ICollection<Expense> Expenses { get; set; } = [];
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

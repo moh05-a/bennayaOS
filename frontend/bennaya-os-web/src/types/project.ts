@@ -26,6 +26,10 @@ export interface Project {
 export interface ProjectDetail extends Project {
   description: string | null
   clientPhone: string | null
+  /** SUM of all expenses, computed by the database. */
+  totalExpenses: number
+  /** Used to warn how much a project deletion will take with it. */
+  expenseCount: number
 }
 
 export interface ProjectInput {

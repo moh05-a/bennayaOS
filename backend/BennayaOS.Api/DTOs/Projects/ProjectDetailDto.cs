@@ -3,9 +3,8 @@ using BennayaOS.Api.Models.Enums;
 namespace BennayaOS.Api.DTOs.Projects;
 
 /// <summary>
-/// The project details page. Financial totals (expenses, received, outstanding)
-/// join this in Phases 6-8, once expenses and client payments exist. We do not
-/// ship zero-valued placeholders - fake numbers destroy trust in a money tool.
+/// The project details page. TotalExpenses is real as of Phase 6.
+/// TotalReceived and the derived balances arrive in Phases 7-8.
 /// </summary>
 public class ProjectDetailDto
 {
@@ -21,6 +20,12 @@ public class ProjectDetailDto
     public required Guid ClientId { get; init; }
     public required string ClientName { get; init; }
     public string? ClientPhone { get; init; }
+
+    /// <summary>SUM of every expense on this project, computed in SQL.</summary>
+    public required decimal TotalExpenses { get; init; }
+
+    /// <summary>Lets the UI warn "this also deletes N expenses" before deleting.</summary>
+    public required int ExpenseCount { get; init; }
 
     public required DateTimeOffset CreatedAt { get; init; }
 }
