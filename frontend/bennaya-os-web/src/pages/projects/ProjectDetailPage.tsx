@@ -11,13 +11,14 @@ import { ApiError } from '../../services/api'
 import { useCurrency } from '../../hooks/useCurrency'
 import { formatDate } from '../../utils/format'
 import { ExpensesTab } from './ExpensesTab'
+import { PaymentsTab } from './PaymentsTab'
 
 /** Tabs are declared here; each one lights up as its phase lands. */
 const TABS = [
   // phase: null means the tab is built and has real content.
   { id: 'overview', label: 'Overview', phase: null },
   { id: 'expenses', label: 'Expenses', phase: null },
-  { id: 'payments', label: 'Payments', phase: 'Phase 7' },
+  { id: 'payments', label: 'Payments', phase: null },
   { id: 'subcontractors', label: 'Subcontractors', phase: 'Phase 11' },
   { id: 'materials', label: 'Materials', phase: 'Phase 13' },
   { id: 'tasks', label: 'Tasks', phase: 'Phase 12' },
@@ -175,6 +176,8 @@ export function ProjectDetailPage() {
       <div className="mt-5">
         {activeTab === 'expenses' ? (
           <ExpensesTab projectId={project.id} />
+        ) : activeTab === 'payments' ? (
+          <PaymentsTab projectId={project.id} />
         ) : activeTab === 'overview' ? (
           <div className="space-y-4">
             {project.description ? (
@@ -211,8 +214,8 @@ export function ProjectDetailPage() {
         title="Delete project"
         message={
           deleteError ??
-          (project.expenseCount > 0
-            ? `Delete "${project.name}"? This also deletes ${project.expenseCount} expense(s) worth ${format(project.totalExpenses)}. This cannot be undone.`
+          (project.expenseCount > 0 || project.paymentCount > 0
+            ? `Delete "${project.name}"? This also deletes ${project.expenseCount} expense(s) and ${project.paymentCount} payment(s). This cannot be undone.`
             : `Delete "${project.name}"? This cannot be undone.`)
         }
         isLoading={deleteMutation.isPending}

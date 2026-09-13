@@ -28,8 +28,15 @@ export interface ProjectDetail extends Project {
   clientPhone: string | null
   /** SUM of all expenses, computed by the database. */
   totalExpenses: number
+  /** SUM of all client payments received. */
+  totalReceived: number
+  /** contractValue - totalReceived. Negative means the client overpaid. */
+  outstandingBalance: number
+  /** contractValue - totalExpenses. Deliberately NOT called profit. */
+  remainingContractValue: number
   /** Used to warn how much a project deletion will take with it. */
   expenseCount: number
+  paymentCount: number
 }
 
 export interface ProjectInput {

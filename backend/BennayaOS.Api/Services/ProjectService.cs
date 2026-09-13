@@ -148,7 +148,13 @@ public class ProjectService : IProjectService
             // Translated into SQL aggregates over the expenses table, not
             // loaded into memory and added up in C#.
             TotalExpenses = p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m,
+            TotalReceived = p.ClientPayments.Sum(cp => (decimal?)cp.Amount) ?? 0m,
+            OutstandingBalance =
+                p.ContractValue - (p.ClientPayments.Sum(cp => (decimal?)cp.Amount) ?? 0m),
+            RemainingContractValue =
+                p.ContractValue - (p.Expenses.Sum(e => (decimal?)e.Amount) ?? 0m),
             ExpenseCount = p.Expenses.Count(),
+            PaymentCount = p.ClientPayments.Count(),
             CreatedAt = p.CreatedAt,
         };
 
