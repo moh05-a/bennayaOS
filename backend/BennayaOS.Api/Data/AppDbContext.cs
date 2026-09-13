@@ -36,6 +36,7 @@ public class AppDbContext : DbContext
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<Subcontractor> Subcontractors => Set<Subcontractor>();
     public DbSet<SubcontractorPayment> SubcontractorPayments => Set<SubcontractorPayment>();
+    public DbSet<ProjectTask> ProjectTasks => Set<ProjectTask>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

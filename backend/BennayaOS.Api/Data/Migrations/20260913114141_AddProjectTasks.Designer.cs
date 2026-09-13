@@ -3,6 +3,7 @@ using System;
 using BennayaOS.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BennayaOS.Api.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260913114141_AddProjectTasks")]
+    partial class AddProjectTasks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -330,18 +333,18 @@ namespace BennayaOS.Api.Data.Migrations
                         .HasColumnName("title");
 
                     b.HasKey("Id")
-                        .HasName("pk_project_tasks");
+                        .HasName("pk_tasks");
 
                     b.HasIndex("CompanyId")
-                        .HasDatabaseName("ix_project_tasks_company_id");
+                        .HasDatabaseName("ix_tasks_company_id");
 
                     b.HasIndex("DueDate")
-                        .HasDatabaseName("ix_project_tasks_due_date");
+                        .HasDatabaseName("ix_tasks_due_date");
 
                     b.HasIndex("ProjectId", "Status")
-                        .HasDatabaseName("ix_project_tasks_project_id_status");
+                        .HasDatabaseName("ix_tasks_project_id_status");
 
-                    b.ToTable("project_tasks", null, t =>
+                    b.ToTable("tasks", null, t =>
                         {
                             t.HasCheckConstraint("ck_project_tasks_status", "status IN ('Todo', 'InProgress', 'Completed')");
                         });
@@ -631,14 +634,14 @@ namespace BennayaOS.Api.Data.Migrations
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_project_tasks_companies_company_id");
+                        .HasConstraintName("fk_tasks_companies_company_id");
 
                     b.HasOne("BennayaOS.Api.Models.Project", "Project")
                         .WithMany("Tasks")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_project_tasks_projects_project_id");
+                        .HasConstraintName("fk_tasks_projects_project_id");
 
                     b.Navigation("Project");
                 });

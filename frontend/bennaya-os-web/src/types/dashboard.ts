@@ -23,6 +23,17 @@ export interface RecentPayment {
 }
 
 /** Business-wide totals. Cancelled projects are excluded from the money figures. */
+export interface UpcomingTask {
+  id: string
+  title: string
+  dueDate: string | null
+  status: string
+  /** Decided by the SERVER, so every device agrees on what is late. */
+  isOverdue: boolean
+  projectId: string
+  projectName: string
+}
+
 export interface Dashboard {
   activeProjects: number
   totalProjects: number
@@ -35,4 +46,6 @@ export interface Dashboard {
   projectsByStatus: StatusCount[]
   recentExpenses: RecentExpense[]
   recentPayments: RecentPayment[]
+  upcomingTasks: UpcomingTask[]
+  overdueTaskCount: number
 }

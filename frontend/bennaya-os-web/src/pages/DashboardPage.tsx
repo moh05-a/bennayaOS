@@ -74,6 +74,15 @@ export function DashboardPage() {
             </Link>
           )}
 
+          {data.overdueTaskCount > 0 && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              <span className="font-medium">
+                {data.overdueTaskCount} task{data.overdueTaskCount === 1 ? '' : 's'} overdue
+              </span>{' '}
+              &mdash; past the due date and not finished.
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <StatCard
               label="Active projects"
@@ -196,8 +205,40 @@ export function DashboardPage() {
             </div>
           </div>
 
+          {data.upcomingTasks.length > 0 && (
+            <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="border-b border-slate-100 px-5 py-4">
+                <h2 className="text-sm font-semibold text-slate-900">Upcoming tasks</h2>
+              </div>
+              <ul className="divide-y divide-slate-100">
+                {data.upcomingTasks.map((task) => (
+                  <li key={task.id}>
+                    <Link
+                      to={`/projects/${task.projectId}`}
+                      className="flex items-center justify-between gap-3 px-5 py-3 hover:bg-slate-50"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-slate-900">{task.title}</p>
+                        <p className="truncate text-xs text-slate-500">{task.projectName}</p>
+                      </div>
+                      <p
+                        className={`shrink-0 text-xs font-medium ${
+                          task.isOverdue ? 'text-red-700' : 'text-slate-500'
+                        }`}
+                      >
+                        {task.dueDate
+                          ? `${task.isOverdue ? 'Overdue · ' : ''}${formatDate(task.dueDate)}`
+                          : 'No due date'}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <p className="text-xs text-slate-400">
-            Money totals exclude cancelled projects.
+            Money totals and tasks exclude cancelled projects.
           </p>
         </div>
       )}

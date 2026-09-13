@@ -35,6 +35,23 @@ public class DashboardDto
     public required IReadOnlyList<StatusCountDto> ProjectsByStatus { get; init; }
     public required IReadOnlyList<RecentExpenseDto> RecentExpenses { get; init; }
     public required IReadOnlyList<RecentPaymentDto> RecentPayments { get; init; }
+
+    /// <summary>Unfinished tasks, soonest due first. Overdue ones come first.</summary>
+    public required IReadOnlyList<UpcomingTaskDto> UpcomingTasks { get; init; }
+
+    /// <summary>Unfinished tasks past their due date, across every project.</summary>
+    public required int OverdueTaskCount { get; init; }
+}
+
+public class UpcomingTaskDto
+{
+    public required Guid Id { get; init; }
+    public required string Title { get; init; }
+    public DateOnly? DueDate { get; init; }
+    public required string Status { get; init; }
+    public required bool IsOverdue { get; init; }
+    public required Guid ProjectId { get; init; }
+    public required string ProjectName { get; init; }
 }
 
 public class StatusCountDto

@@ -108,6 +108,35 @@ public class DashboardService : IDashboardService
             })
             .ToListAsync(cancellationToken);
 
+        // The server's date decides what is overdue, so every device agrees.
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        var unfinishedTasks = _db.ProjectTasks
+            .AsNoTracking()
+            .Where(t => t.Status != ProjectTaskStatus.Completed
+                        && t.Project.Status != ProjectStatus.Cancelled);
+
+        var overdueTaskCount = await unfinishedTasks
+            .CountAsync(t => t.DueDate != null && t.DueDate < today, cancellationToken);
+
+        var upcomingTasks = await unfinishedTasks
+            // Dated tasks before undated ones, soonest first - so anything
+            // overdue naturally floats to the top.
+            .OrderBy(t => t.DueDate == null)
+            .ThenBy(t => t.DueDate)
+            .Take(RecentItemCount)
+            .Select(t => new UpcomingTaskDto
+            {
+                Id = t.Id,
+                Title = t.Title,
+                DueDate = t.DueDate,
+                Status = t.Status.ToString(),
+                IsOverdue = t.DueDate != null && t.DueDate < today,
+                ProjectId = t.ProjectId,
+                ProjectName = t.Project.Name,
+            })
+            .ToListAsync(cancellationToken);
+
         return new DashboardDto
         {
             ActiveProjects = activeProjects,
@@ -123,6 +152,8 @@ public class DashboardService : IDashboardService
                 .ToList(),
             RecentExpenses = recentExpenses,
             RecentPayments = recentPayments,
+            UpcomingTasks = upcomingTasks,
+            OverdueTaskCount = overdueTaskCount,
         };
     }
 }
