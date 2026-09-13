@@ -6,6 +6,7 @@ import { Input } from '../../components/ui/Input'
 import { Modal } from '../../components/ui/Modal'
 import { paymentsApi } from '../../services/paymentsApi'
 import { ApiError } from '../../services/api'
+import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
 import { todayIsoDate } from '../../utils/format'
 import type { ClientPayment } from '../../types/payment'
@@ -68,9 +69,7 @@ export function PaymentFormModal({ isOpen, projectId, payment, onClose }: Paymen
         : paymentsApi.create(projectId, payload)
     },
     onSuccess: () => {
-      // The payments list AND the project header both go stale.
-      void queryClient.invalidateQueries({ queryKey: ['payments', projectId] })
-      void queryClient.invalidateQueries({ queryKey: ['projects'] })
+      invalidateProjectFinancials(queryClient, projectId)
       onClose()
     },
     onError: (error: unknown) => {

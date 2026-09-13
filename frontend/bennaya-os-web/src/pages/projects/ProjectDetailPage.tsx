@@ -47,6 +47,7 @@ export function ProjectDetailPage() {
     mutationFn: () => projectsApi.remove(id!),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['projects'] })
+      void queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       navigate('/projects', { replace: true })
     },
     onError: (caught: unknown) => {

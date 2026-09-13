@@ -85,6 +85,7 @@ export function ProjectFormPage() {
     },
     onSuccess: (project) => {
       void queryClient.invalidateQueries({ queryKey: ['projects'] })
+      void queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       navigate(`/projects/${project.id}`, { replace: true })
     },
     onError: (error: unknown) => {

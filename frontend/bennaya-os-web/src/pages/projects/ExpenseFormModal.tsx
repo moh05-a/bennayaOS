@@ -7,6 +7,7 @@ import { Modal } from '../../components/ui/Modal'
 import { Select } from '../../components/ui/Select'
 import { expensesApi } from '../../services/expensesApi'
 import { ApiError } from '../../services/api'
+import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
 import { todayIsoDate } from '../../utils/format'
 import { EXPENSE_CATEGORIES } from '../../types/expense'
@@ -64,10 +65,7 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
         : expensesApi.create(projectId, payload)
     },
     onSuccess: () => {
-      // Two caches go stale: the expense list AND the project, whose
-      // totalExpenses the server recalculated.
-      void queryClient.invalidateQueries({ queryKey: ['expenses', projectId] })
-      void queryClient.invalidateQueries({ queryKey: ['projects'] })
+      invalidateProjectFinancials(queryClient, projectId)
       onClose()
     },
     onError: (error: unknown) => {

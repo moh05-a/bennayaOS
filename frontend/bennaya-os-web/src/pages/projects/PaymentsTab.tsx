@@ -8,6 +8,7 @@ import { Spinner } from '../../components/ui/Spinner'
 import { StatCard } from '../../components/ui/StatCard'
 import { paymentsApi } from '../../services/paymentsApi'
 import { ApiError } from '../../services/api'
+import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
 import { formatDate } from '../../utils/format'
 import type { ClientPayment } from '../../types/payment'
@@ -30,8 +31,7 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => paymentsApi.remove(id),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['payments', projectId] })
-      void queryClient.invalidateQueries({ queryKey: ['projects'] })
+      invalidateProjectFinancials(queryClient, projectId)
       setDeleting(null)
       setDeleteError(null)
     },

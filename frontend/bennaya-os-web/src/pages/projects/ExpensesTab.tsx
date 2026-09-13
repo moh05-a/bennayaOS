@@ -7,6 +7,7 @@ import { ErrorMessage } from '../../components/ui/ErrorMessage'
 import { Spinner } from '../../components/ui/Spinner'
 import { expensesApi } from '../../services/expensesApi'
 import { ApiError } from '../../services/api'
+import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
 import { formatDate } from '../../utils/format'
 import type { Expense } from '../../types/expense'
@@ -50,8 +51,7 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => expensesApi.remove(id),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['expenses', projectId] })
-      void queryClient.invalidateQueries({ queryKey: ['projects'] })
+      invalidateProjectFinancials(queryClient, projectId)
       setDeleting(null)
       setDeleteError(null)
     },
