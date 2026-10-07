@@ -12,6 +12,7 @@ import { clientsApi } from '../../services/clientsApi'
 import { projectsApi } from '../../services/projectsApi'
 import { ApiError } from '../../services/api'
 import { useCurrency } from '../../hooks/useCurrency'
+import { useLanguage } from '../../hooks/useLanguage'
 import { PROJECT_STATUSES } from '../../types/project'
 import type { ProjectStatus } from '../../types/project'
 
@@ -36,6 +37,7 @@ export function ProjectFormPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { currencyCode } = useCurrency()
+  const { t } = useLanguage()
 
   const [form, setForm] = useState(EMPTY_FORM)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
@@ -94,7 +96,7 @@ export function ProjectFormPage() {
         if (Object.keys(errors).length > 0) setFieldErrors(errors)
         else setFormError(error.message)
       } else {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('errors.generic'))
       }
     },
   })
@@ -111,23 +113,23 @@ export function ProjectFormPage() {
     mutation.mutate(form)
   }
 
-  if (isEditing && projectLoading) return <Spinner label="Loading project" />
+  if (isEditing && projectLoading) return <Spinner label={t('projects.loadingProject')} />
 
   const hasClients = clients !== undefined && clients.length > 0
 
   return (
     <div className="mx-auto max-w-2xl">
-      <PageHeader title={isEditing ? 'Edit project' : 'New project'} />
+      <PageHeader title={isEditing ? t('projects.editTitle') : t('projects.new')} />
 
       {!clientsLoading && !hasClients && (
         <div className="mb-5 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          You need a client before creating a project.{' '}
+          {t('projects.needClient')}{' '}
           <button
             type="button"
             onClick={() => navigate('/clients')}
             className="font-medium underline underline-offset-2"
           >
-            Add a client first
+            {t('projects.addClientFirst')}
           </button>
         </div>
       )}
@@ -139,26 +141,26 @@ export function ProjectFormPage() {
         {formError && <ErrorMessage message={formError} />}
 
         <Input
-          label="Project name"
+          label={t('projects.name')}
           required
           value={form.name}
           onChange={update('name')}
           error={fieldErrors.name}
-          placeholder="Khalda Villa - Finishing"
+          placeholder={t('projects.namePlaceholder')}
         />
 
         <Select
-          label="Client"
+          label={t('projects.client')}
           required
           value={form.clientId}
           onChange={update('clientId')}
           error={fieldErrors.clientid}
-          placeholder={clientsLoading ? 'Loading clients...' : 'Select a client'}
+          placeholder={clientsLoading ? t('projects.loadingClients') : t('projects.selectClient')}
           options={(clients ?? []).map((client) => ({ value: client.id, label: client.name }))}
         />
 
         <Input
-          label={`Contract value (${currencyCode})`}
+          label={t('projects.contractValueWithCurrency', { currency: currencyCode })}
           type="number"
           // step allows fils precision; inputMode gives phones a numeric keypad.
           step="0.001"
@@ -172,23 +174,23 @@ export function ProjectFormPage() {
         />
 
         <Input
-          label="Location"
+          label={t('projects.location')}
           value={form.location}
           onChange={update('location')}
           error={fieldErrors.location}
-          placeholder="Khalda, Amman"
+          placeholder={t('projects.locationPlaceholder')}
         />
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
-            label="Start date"
+            label={t('projects.startDate')}
             type="date"
             value={form.startDate}
             onChange={update('startDate')}
             error={fieldErrors.startdate}
           />
           <Input
-            label="Expected end date"
+            label={t('projects.expectedEndDate')}
             type="date"
             value={form.expectedEndDate}
             onChange={update('expectedEndDate')}
@@ -197,19 +199,19 @@ export function ProjectFormPage() {
         </div>
 
         <Select
-          label="Status"
+          label={t('fields.status')}
           value={form.status}
           onChange={update('status')}
           error={fieldErrors.status}
-          options={PROJECT_STATUSES.map((s) => ({ value: s.value, label: s.label }))}
+          options={PROJECT_STATUSES.map((s) => ({ value: s, label: t(`projectStatus.${s}`) }))}
         />
 
         <Textarea
-          label="Description"
+          label={t('fields.description')}
           value={form.description}
           onChange={update('description')}
           error={fieldErrors.description}
-          placeholder="Scope of work, key notes..."
+          placeholder={t('projects.descriptionPlaceholder')}
         />
 
         <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
@@ -219,10 +221,10 @@ export function ProjectFormPage() {
             onClick={() => navigate(-1)}
             disabled={mutation.isPending}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" isLoading={mutation.isPending} disabled={!hasClients}>
-            {isEditing ? 'Save changes' : 'Create project'}
+            {isEditing ? t('common.saveChanges') : t('projects.create')}
           </Button>
         </div>
       </form>

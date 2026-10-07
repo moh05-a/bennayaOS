@@ -1,12 +1,15 @@
 export type ProjectStatus = 'Planning' | 'Active' | 'OnHold' | 'Completed' | 'Cancelled'
 
-/** Kept in one place so dropdowns and badges never drift apart. */
-export const PROJECT_STATUSES: { value: ProjectStatus; label: string }[] = [
-  { value: 'Planning', label: 'Planning' },
-  { value: 'Active', label: 'Active' },
-  { value: 'OnHold', label: 'On hold' },
-  { value: 'Completed', label: 'Completed' },
-  { value: 'Cancelled', label: 'Cancelled' },
+/**
+ * Kept in one place so dropdowns and badges never drift apart.
+ * Labels are translated: t(`projectStatus.${status}`).
+ */
+export const PROJECT_STATUSES: ProjectStatus[] = [
+  'Planning',
+  'Active',
+  'OnHold',
+  'Completed',
+  'Cancelled',
 ]
 
 export interface Project {

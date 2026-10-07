@@ -13,7 +13,8 @@ import { materialsApi } from '../../services/materialsApi'
 import { ApiError } from '../../services/api'
 import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
-import { MATERIAL_UNITS, unitShort } from '../../types/material'
+import { useLanguage } from '../../hooks/useLanguage'
+import { MATERIAL_UNITS } from '../../types/material'
 import type { Material, MaterialUnit } from '../../types/material'
 
 const EMPTY_FORM = {
@@ -33,6 +34,7 @@ function qty(value: number): string {
 export function MaterialsTab({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient()
   const { format } = useCurrency()
+  const { t } = useLanguage()
 
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editing, setEditing] = useState<Material | null>(null)
@@ -70,7 +72,7 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
         if (Object.keys(errors).length > 0) setFieldErrors(errors)
         else setFormError(caught.message)
       } else {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('errors.generic'))
       }
     },
   })
@@ -111,12 +113,12 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
     (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
       setForm((current) => ({ ...current, [field]: event.target.value }))
 
-  if (isPending) return <Spinner label="Loading materials" />
+  if (isPending) return <Spinner label={t('materials.loading')} />
 
   if (isError) {
     return (
       <ErrorMessage
-        message={error instanceof ApiError ? error.message : 'Could not load materials.'}
+        message={error instanceof ApiError ? error.message : t('materials.loadError')}
       />
     )
   }
@@ -126,30 +128,30 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button onClick={openCreate}>Add material</Button>
+        <Button onClick={openCreate}>{t('materials.add')}</Button>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <StatCard label="Estimated budget" value={format(totalEstimatedCost)} />
-        <StatCard label="Purchased so far" value={format(totalPurchasedCost)} />
+        <StatCard label={t('materials.estimatedBudget')} value={format(totalEstimatedCost)} />
+        <StatCard label={t('materials.purchasedSoFar')} value={format(totalPurchasedCost)} />
         <StatCard
-          label="Still to buy"
+          label={t('materials.stillToBuy')}
           value={String(itemsNeedingPurchase)}
-          hint={`of ${items.length} material${items.length === 1 ? '' : 's'}`}
+          hint={t('materials.ofMaterials', { count: items.length })}
           tone={itemsNeedingPurchase > 0 ? 'warning' : 'default'}
         />
       </div>
 
       {items.length === 0 ? (
         <EmptyState
-          title="No materials yet"
-          description="Track what each project needs, what you have bought and what has been used on site."
-          action={<Button onClick={openCreate}>Add material</Button>}
+          title={t('materials.emptyTitle')}
+          description={t('materials.emptyDescription')}
+          action={<Button onClick={openCreate}>{t('materials.add')}</Button>}
         />
       ) : (
         <ul className="space-y-3">
           {items.map((material) => {
-            const unit = unitShort(material.unit)
+            const unit = t(`materialUnitShort.${material.unit}`)
             const purchasedPercent =
               material.requiredQuantity > 0
                 ? Math.min(100, (material.purchasedQuantity / material.requiredQuantity) * 100)
@@ -168,13 +170,16 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
                   <div className="min-w-0">
                     <p className="font-medium text-slate-900">{material.name}</p>
                     <p className="text-xs text-slate-500">
-                      {format(material.estimatedUnitCost)} per {unit} &middot; budget{' '}
-                      {format(material.estimatedTotalCost)}
+                      {t('materials.costPerUnitLine', {
+                        cost: format(material.estimatedUnitCost),
+                        unit,
+                        budget: format(material.estimatedTotalCost),
+                      })}
                     </p>
                   </div>
 
-                  <div className="text-right">
-                    <p className="text-xs text-slate-500">Available on site</p>
+                  <div className="text-end">
+                    <p className="text-xs text-slate-500">{t('materials.availableOnSite')}</p>
                     <p
                       className={`text-lg font-semibold tabular-nums ${
                         material.availableQuantity < 0 ? 'text-red-700' : 'text-slate-900'
@@ -185,30 +190,31 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
                   </div>
                 </div>
 
-                {/* The four quantities, laid out so they read left to right in
-                    the order a contractor thinks about them. */}
+                {/* The four quantities, laid out so they read in the order a
+                    contractor thinks about them (left to right, or right to
+                    left in Arabic - the grid follows the page direction). */}
                 <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                   <div className="rounded-lg bg-slate-50 px-2.5 py-2">
-                    <dt className="text-xs text-slate-500">Required</dt>
+                    <dt className="text-xs text-slate-500">{t('materials.required')}</dt>
                     <dd className="text-sm font-medium tabular-nums text-slate-900">
                       {qty(material.requiredQuantity)} {unit}
                     </dd>
                   </div>
                   <div className="rounded-lg bg-slate-50 px-2.5 py-2">
-                    <dt className="text-xs text-slate-500">Purchased</dt>
+                    <dt className="text-xs text-slate-500">{t('materials.purchased')}</dt>
                     <dd className="text-sm font-medium tabular-nums text-slate-900">
                       {qty(material.purchasedQuantity)} {unit}
                     </dd>
                   </div>
                   <div className="rounded-lg bg-slate-50 px-2.5 py-2">
-                    <dt className="text-xs text-slate-500">Used</dt>
+                    <dt className="text-xs text-slate-500">{t('materials.used')}</dt>
                     <dd className="text-sm font-medium tabular-nums text-slate-900">
                       {qty(material.usedQuantity)} {unit}
                     </dd>
                   </div>
                   <div className="rounded-lg bg-slate-50 px-2.5 py-2">
                     <dt className="text-xs text-slate-500">
-                      {material.isOverSupplied ? 'Over-ordered' : 'To buy'}
+                      {material.isOverSupplied ? t('materials.overOrdered') : t('materials.toBuy')}
                     </dt>
                     <dd
                       className={`text-sm font-medium tabular-nums ${
@@ -233,29 +239,30 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
 
                 {material.isOverUsed && (
                   <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
-                    More has been used ({qty(material.usedQuantity)} {unit}) than purchased (
-                    {qty(material.purchasedQuantity)} {unit}). Either stock came from elsewhere, or
-                    one of these numbers is wrong.
+                    {t('materials.overUsedWarning', {
+                      used: `${qty(material.usedQuantity)} ${unit}`,
+                      purchased: `${qty(material.purchasedQuantity)} ${unit}`,
+                    })}
                   </p>
                 )}
 
                 {material.isOverSupplied && (
                   <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
-                    {qty(Math.abs(material.remainingToPurchase))} {unit} more was bought than this
-                    job needs &mdash; roughly{' '}
-                    {format(
-                      Math.abs(material.remainingToPurchase) * material.estimatedUnitCost,
-                    )}{' '}
-                    tied up in surplus stock.
+                    {t('materials.overSuppliedWarning', {
+                      quantity: `${qty(Math.abs(material.remainingToPurchase))} ${unit}`,
+                      amount: format(
+                        Math.abs(material.remainingToPurchase) * material.estimatedUnitCost,
+                      ),
+                    })}
                   </p>
                 )}
 
                 <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
                   <Button variant="secondary" onClick={() => openEdit(material)}>
-                    Edit
+                    {t('common.edit')}
                   </Button>
                   <Button variant="ghost" onClick={() => setDeleting(material)}>
-                    Delete
+                    {t('common.delete')}
                   </Button>
                 </div>
               </li>
@@ -266,7 +273,7 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
 
       <Modal
         isOpen={isFormOpen}
-        title={editing ? 'Edit material' : 'Add material'}
+        title={editing ? t('materials.edit') : t('materials.add')}
         onClose={() => setIsFormOpen(false)}
       >
         <form
@@ -281,27 +288,27 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
           {formError && <ErrorMessage message={formError} />}
 
           <Input
-            label="Material"
+            label={t('materials.material')}
             required
             autoFocus
             value={form.name}
             onChange={update('name')}
             error={fieldErrors.name}
-            placeholder="Cement"
+            placeholder={t('materials.namePlaceholder')}
           />
 
           <Select
-            label="Unit"
+            label={t('materials.unit')}
             required
             value={form.unit}
             onChange={update('unit')}
             error={fieldErrors.unit}
-            options={MATERIAL_UNITS.map((u) => ({ value: u.value, label: u.label }))}
+            options={MATERIAL_UNITS.map((u) => ({ value: u, label: t(`materialUnit.${u}`) }))}
           />
 
           <div className="grid gap-3 sm:grid-cols-3">
             <Input
-              label="Required"
+              label={t('materials.required')}
               type="number"
               step="0.001"
               min="0"
@@ -312,7 +319,7 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
               placeholder="1000"
             />
             <Input
-              label="Purchased"
+              label={t('materials.purchased')}
               type="number"
               step="0.001"
               min="0"
@@ -323,7 +330,7 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
               placeholder="700"
             />
             <Input
-              label="Used"
+              label={t('materials.used')}
               type="number"
               step="0.001"
               min="0"
@@ -336,7 +343,7 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
           </div>
 
           <Input
-            label="Cost per unit"
+            label={t('materials.costPerUnit')}
             type="number"
             step="0.001"
             min="0"
@@ -344,7 +351,7 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
             value={form.estimatedUnitCost}
             onChange={update('estimatedUnitCost')}
             error={fieldErrors.estimatedunitcost}
-            hint="Per unit, not the total - the budget is calculated for you"
+            hint={t('materials.costPerUnitHint')}
             placeholder="4.500"
           />
 
@@ -355,10 +362,10 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
               onClick={() => setIsFormOpen(false)}
               disabled={saveMutation.isPending}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" isLoading={saveMutation.isPending}>
-              {editing ? 'Save changes' : 'Add material'}
+              {editing ? t('common.saveChanges') : t('materials.add')}
             </Button>
           </div>
         </form>
@@ -366,8 +373,8 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
 
       <ConfirmDialog
         isOpen={deleting !== null}
-        title="Delete material"
-        message={`Delete "${deleting?.name}"? This cannot be undone.`}
+        title={t('materials.deleteTitle')}
+        message={t('common.confirmDelete', { name: deleting?.name ?? '' })}
         isLoading={deleteMutation.isPending}
         onConfirm={() => deleting && deleteMutation.mutate(deleting.id)}
         onCancel={() => setDeleting(null)}

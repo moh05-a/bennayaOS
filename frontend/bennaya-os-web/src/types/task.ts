@@ -1,10 +1,7 @@
 export type ProjectTaskStatus = 'Todo' | 'InProgress' | 'Completed'
 
-export const TASK_STATUSES: { value: ProjectTaskStatus; label: string }[] = [
-  { value: 'Todo', label: 'To do' },
-  { value: 'InProgress', label: 'In progress' },
-  { value: 'Completed', label: 'Completed' },
-]
+/** Labels are translated: t(`taskStatus.${status}`). */
+export const TASK_STATUSES: ProjectTaskStatus[] = ['Todo', 'InProgress', 'Completed']
 
 export interface ProjectTask {
   id: string

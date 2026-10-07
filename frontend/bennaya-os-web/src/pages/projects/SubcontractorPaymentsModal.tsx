@@ -9,7 +9,8 @@ import { subcontractorsApi } from '../../services/subcontractorsApi'
 import { ApiError } from '../../services/api'
 import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
-import { formatDate, todayIsoDate } from '../../utils/format'
+import { useLanguage } from '../../hooks/useLanguage'
+import { todayIsoDate } from '../../utils/format'
 import type { Subcontractor } from '../../types/subcontractor'
 
 interface SubcontractorPaymentsModalProps {
@@ -32,6 +33,7 @@ export function SubcontractorPaymentsModal({
 }: SubcontractorPaymentsModalProps) {
   const queryClient = useQueryClient()
   const { format } = useCurrency()
+  const { t, formatDate } = useLanguage()
 
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(todayIsoDate())
@@ -71,7 +73,7 @@ export function SubcontractorPaymentsModal({
         if (Object.keys(errors).length > 0) setFieldErrors(errors)
         else setFormError(error.message)
       } else {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('errors.generic'))
       }
     },
   })
@@ -93,23 +95,29 @@ export function SubcontractorPaymentsModal({
   const isOverpaid = subcontractor.remaining < 0
 
   return (
-    <Modal isOpen={isOpen} title={`Payments - ${subcontractor.name}`} onClose={onClose}>
+    <Modal
+      isOpen={isOpen}
+      title={t('subcontractors.paymentsTitle', { name: subcontractor.name })}
+      onClose={onClose}
+    >
       <div className="space-y-4">
         <div className="grid grid-cols-3 gap-2 rounded-lg bg-slate-50 p-3 text-center">
           <div>
-            <p className="text-xs text-slate-500">Contract</p>
+            <p className="text-xs text-slate-500">{t('subcontractors.contract')}</p>
             <p className="text-sm font-semibold tabular-nums text-slate-900">
               {format(subcontractor.contractAmount)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-slate-500">Paid</p>
+            <p className="text-xs text-slate-500">{t('subcontractors.paid')}</p>
             <p className="text-sm font-semibold tabular-nums text-slate-900">
               {format(subcontractor.totalPaid)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-slate-500">{isOverpaid ? 'Overpaid' : 'Remaining'}</p>
+            <p className="text-xs text-slate-500">
+              {isOverpaid ? t('subcontractors.overpaid') : t('subcontractors.remaining')}
+            </p>
             <p
               className={`text-sm font-semibold tabular-nums ${
                 isOverpaid ? 'text-amber-700' : 'text-slate-900'
@@ -125,7 +133,7 @@ export function SubcontractorPaymentsModal({
 
           <div className="grid gap-3 sm:grid-cols-2">
             <Input
-              label="Amount"
+              label={t('fields.amount')}
               type="number"
               step="0.001"
               min="0"
@@ -137,7 +145,7 @@ export function SubcontractorPaymentsModal({
               placeholder="4000.000"
             />
             <Input
-              label="Date"
+              label={t('fields.date')}
               type="date"
               required
               value={date}
@@ -147,26 +155,28 @@ export function SubcontractorPaymentsModal({
           </div>
 
           <Input
-            label="Note"
+            label={t('subcontractors.note')}
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="First instalment"
+            placeholder={t('subcontractors.notePlaceholder')}
           />
 
           <Button type="submit" isLoading={addMutation.isPending} className="w-full">
-            Record payment
+            {t('subcontractors.recordPayment')}
           </Button>
         </form>
 
         <div className="border-t border-slate-100 pt-4">
           <h3 className="text-xs font-medium uppercase tracking-wide text-slate-500">
-            Payment history
+            {t('subcontractors.history')}
           </h3>
 
           {isPending ? (
-            <Spinner label="Loading payments" />
+            <Spinner label={t('subcontractors.loadingPayments')} />
           ) : !payments || payments.length === 0 ? (
-            <p className="py-6 text-center text-sm text-slate-500">No payments yet.</p>
+            <p className="py-6 text-center text-sm text-slate-500">
+              {t('subcontractors.noPayments')}
+            </p>
           ) : (
             <ul className="mt-2 divide-y divide-slate-100">
               {payments.map((payment) => (
@@ -186,7 +196,7 @@ export function SubcontractorPaymentsModal({
                     disabled={deleteMutation.isPending}
                     className="shrink-0 rounded px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 hover:text-red-700 disabled:opacity-50"
                   >
-                    Remove
+                    {t('common.remove')}
                   </button>
                 </li>
               ))}

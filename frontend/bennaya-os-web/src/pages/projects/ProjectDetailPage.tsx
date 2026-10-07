@@ -9,7 +9,7 @@ import { StatusBadge } from '../../components/ui/StatusBadge'
 import { projectsApi } from '../../services/projectsApi'
 import { ApiError } from '../../services/api'
 import { useCurrency } from '../../hooks/useCurrency'
-import { formatDate } from '../../utils/format'
+import { useLanguage } from '../../hooks/useLanguage'
 import { ExpensesTab } from './ExpensesTab'
 import { OverviewTab } from './OverviewTab'
 import { PaymentsTab } from './PaymentsTab'
@@ -20,12 +20,13 @@ import { MaterialsTab } from './MaterialsTab'
 /** Tabs are declared here; each one lights up as its phase lands. */
 const TABS = [
   // phase: null means the tab is built and has real content.
-  { id: 'overview', label: 'Overview', phase: null },
-  { id: 'expenses', label: 'Expenses', phase: null },
-  { id: 'payments', label: 'Payments', phase: null },
-  { id: 'subcontractors', label: 'Subcontractors', phase: null },
-  { id: 'materials', label: 'Materials', phase: null },
-  { id: 'tasks', label: 'Tasks', phase: null },
+  // Labels are translated: t(`projects.tabs.${id}`).
+  { id: 'overview', phase: null },
+  { id: 'expenses', phase: null },
+  { id: 'payments', phase: null },
+  { id: 'subcontractors', phase: null },
+  { id: 'materials', phase: null },
+  { id: 'tasks', phase: null },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
@@ -35,6 +36,7 @@ export function ProjectDetailPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { format } = useCurrency()
+  const { t, formatDate } = useLanguage()
 
   const [activeTab, setActiveTab] = useState<TabId>('overview')
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
@@ -55,24 +57,24 @@ export function ProjectDetailPage() {
     },
     onError: (caught: unknown) => {
       setDeleteError(
-        caught instanceof ApiError ? caught.message : 'Could not delete this project.',
+        caught instanceof ApiError ? caught.message : t('projects.deleteError'),
       )
     },
   })
 
-  if (isPending) return <Spinner label="Loading project" />
+  if (isPending) return <Spinner label={t('projects.loadingProject')} />
 
   if (isError || !project) {
     return (
       <div className="mx-auto max-w-4xl">
         <ErrorMessage
-          message={error instanceof ApiError ? error.message : 'Could not load this project.'}
+          message={error instanceof ApiError ? error.message : t('projects.loadErrorOne')}
         />
         <Link
           to="/projects"
           className="mt-4 inline-block text-sm font-medium text-slate-900 underline underline-offset-4"
         >
-          Back to projects
+          {t('projects.backToProjects')}
         </Link>
       </div>
     )
@@ -86,7 +88,7 @@ export function ProjectDetailPage() {
         to="/projects"
         className="mb-4 inline-block text-sm text-slate-500 hover:text-slate-900"
       >
-        &larr; Projects
+        {t('projects.backLink')}
       </Link>
 
       {/* HEADER */}
@@ -107,7 +109,7 @@ export function ProjectDetailPage() {
                     href={`tel:${project.clientPhone}`}
                     className="underline underline-offset-2"
                   >
-                    {project.clientPhone}
+                    <span dir="ltr">{project.clientPhone}</span>
                   </a>
                 </>
               )}
@@ -120,10 +122,10 @@ export function ProjectDetailPage() {
 
           <div className="flex shrink-0 gap-2">
             <Button variant="secondary" onClick={() => navigate(`/projects/${project.id}/edit`)}>
-              Edit
+              {t('common.edit')}
             </Button>
             <Button variant="ghost" onClick={() => setIsConfirmingDelete(true)}>
-              Delete
+              {t('common.delete')}
             </Button>
           </div>
         </div>
@@ -131,19 +133,21 @@ export function ProjectDetailPage() {
         <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-slate-100 pt-5 sm:grid-cols-3">
           <div>
             <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Contract value
+              {t('money.contractValue')}
             </dt>
             <dd className="mt-1 text-lg font-semibold tabular-nums text-slate-900">
               {format(project.contractValue)}
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Start</dt>
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              {t('projects.start')}
+            </dt>
             <dd className="mt-1 text-sm text-slate-900">{formatDate(project.startDate)}</dd>
           </div>
           <div>
             <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Expected end
+              {t('projects.expectedEnd')}
             </dt>
             <dd className="mt-1 text-sm text-slate-900">{formatDate(project.expectedEndDate)}</dd>
           </div>
@@ -164,7 +168,7 @@ export function ProjectDetailPage() {
                   : 'border-transparent text-slate-500 hover:text-slate-800'
               }`}
             >
-              {tab.label}
+              {t(`projects.tabs.${tab.id}`)}
             </button>
           ))}
         </div>
@@ -186,7 +190,11 @@ export function ProjectDetailPage() {
         ) : (
           <div className="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
             <p className="text-sm text-slate-500">
-              {activeTabMeta?.label} arrives in {activeTabMeta?.phase}.
+              {activeTabMeta &&
+                t('common.arrivesIn', {
+                  title: t(`projects.tabs.${activeTabMeta.id}`),
+                  phase: String(activeTabMeta.phase),
+                })}
             </p>
           </div>
         )}
@@ -194,12 +202,17 @@ export function ProjectDetailPage() {
 
       <ConfirmDialog
         isOpen={isConfirmingDelete}
-        title="Delete project"
+        title={t('projects.deleteTitle')}
         message={
           deleteError ??
           (project.expenseCount > 0 || project.paymentCount > 0 || project.subcontractorCount > 0
-            ? `Delete "${project.name}"? This also deletes ${project.expenseCount} expense(s), ${project.paymentCount} payment(s) and ${project.subcontractorCount} subcontractor(s). This cannot be undone.`
-            : `Delete "${project.name}"? This cannot be undone.`)
+            ? t('projects.deleteWithChildren', {
+                name: project.name,
+                expenses: project.expenseCount,
+                payments: project.paymentCount,
+                subcontractors: project.subcontractorCount,
+              })
+            : t('common.confirmDelete', { name: project.name }))
         }
         isLoading={deleteMutation.isPending}
         onConfirm={() => deleteMutation.mutate()}

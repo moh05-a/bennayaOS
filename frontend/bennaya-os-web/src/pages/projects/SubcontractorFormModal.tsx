@@ -8,6 +8,7 @@ import { subcontractorsApi } from '../../services/subcontractorsApi'
 import { ApiError } from '../../services/api'
 import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
+import { useLanguage } from '../../hooks/useLanguage'
 import { COMMON_TRADES } from '../../types/subcontractor'
 import type { Subcontractor } from '../../types/subcontractor'
 
@@ -28,6 +29,7 @@ export function SubcontractorFormModal({
 }: SubcontractorFormModalProps) {
   const queryClient = useQueryClient()
   const { currencyCode } = useCurrency()
+  const { t } = useLanguage()
 
   const [form, setForm] = useState(EMPTY_FORM)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
@@ -71,7 +73,7 @@ export function SubcontractorFormModal({
         if (Object.keys(errors).length > 0) setFieldErrors(errors)
         else setFormError(error.message)
       } else {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('errors.generic'))
       }
     },
   })
@@ -89,49 +91,52 @@ export function SubcontractorFormModal({
   return (
     <Modal
       isOpen={isOpen}
-      title={subcontractor ? 'Edit subcontractor' : 'Add subcontractor'}
+      title={subcontractor ? t('subcontractors.edit') : t('subcontractors.add')}
       onClose={onClose}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {formError && <ErrorMessage message={formError} />}
 
         <Input
-          label="Name"
+          label={t('fields.name')}
           required
           autoFocus
           value={form.name}
           onChange={update('name')}
           error={fieldErrors.name}
-          placeholder="Ahmad Al-Khatib"
+          placeholder={t('subcontractors.namePlaceholder')}
         />
 
         <div className="space-y-2">
           <Input
-            label="Specialty"
+            label={t('subcontractors.specialty')}
             value={form.specialty}
             onChange={update('specialty')}
             error={fieldErrors.specialty}
-            placeholder="Electrician"
+            placeholder={t('trades.electrician')}
           />
 
           {/* Free text with shortcuts: trades vary by market, so a fixed list
               would push real work into "Other". */}
           <div className="flex flex-wrap gap-1.5">
-            {COMMON_TRADES.map((trade) => (
-              <button
-                key={trade}
-                type="button"
-                onClick={() => setForm((current) => ({ ...current, specialty: trade }))}
-                className="rounded-full border border-slate-300 px-2.5 py-1 text-xs text-slate-600 hover:bg-slate-50"
-              >
-                {trade}
-              </button>
-            ))}
+            {COMMON_TRADES.map((key) => {
+              const trade = t(`trades.${key}`)
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setForm((current) => ({ ...current, specialty: trade }))}
+                  className="rounded-full border border-slate-300 px-2.5 py-1 text-xs text-slate-600 hover:bg-slate-50"
+                >
+                  {trade}
+                </button>
+              )
+            })}
           </div>
         </div>
 
         <Input
-          label="Phone"
+          label={t('fields.phone')}
           type="tel"
           inputMode="tel"
           value={form.phone}
@@ -141,7 +146,7 @@ export function SubcontractorFormModal({
         />
 
         <Input
-          label={`Contract amount (${currencyCode})`}
+          label={t('subcontractors.contractAmountWithCurrency', { currency: currencyCode })}
           type="number"
           step="0.001"
           min="0"
@@ -150,16 +155,16 @@ export function SubcontractorFormModal({
           value={form.contractAmount}
           onChange={update('contractAmount')}
           error={fieldErrors.contractamount}
-          hint="Leave as 0 if the amount is not agreed yet"
+          hint={t('subcontractors.contractAmountHint')}
           placeholder="8500.000"
         />
 
         <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
           <Button type="button" variant="secondary" onClick={onClose} disabled={mutation.isPending}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" isLoading={mutation.isPending}>
-            {subcontractor ? 'Save changes' : 'Add subcontractor'}
+            {subcontractor ? t('common.saveChanges') : t('subcontractors.add')}
           </Button>
         </div>
       </form>

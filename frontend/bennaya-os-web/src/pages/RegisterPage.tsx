@@ -3,11 +3,14 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { ErrorMessage } from '../components/ui/ErrorMessage'
+import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { useAuth } from '../hooks/useAuth'
+import { useLanguage } from '../hooks/useLanguage'
 import { ApiError } from '../services/api'
 
 export function RegisterPage() {
   const { register, isAuthenticated } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
   const [form, setForm] = useState({
@@ -45,7 +48,7 @@ export function RegisterPage() {
           setError(caught.message)
         }
       } else {
-        setError('Something went wrong. Please try again.')
+        setError(t('errors.generic'))
       }
     } finally {
       setIsSubmitting(false)
@@ -53,11 +56,13 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
+    <div className="relative flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
+      <LanguageSwitcher className="absolute end-4 top-4" />
+
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-semibold text-slate-900">Create your account</h1>
-          <p className="mt-1 text-sm text-slate-500">Set up your contracting company</p>
+          <h1 className="text-2xl font-semibold text-slate-900">{t('auth.registerTitle')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('auth.registerSubtitle')}</p>
         </div>
 
         <form
@@ -67,27 +72,27 @@ export function RegisterPage() {
           {error && <ErrorMessage message={error} />}
 
           <Input
-            label="Your full name"
+            label={t('auth.fullName')}
             required
             autoComplete="name"
             value={form.fullName}
             onChange={update('fullName')}
             error={fieldErrors.fullname}
-            placeholder="Mohammad Ali"
+            placeholder={t('auth.fullNamePlaceholder')}
           />
 
           <Input
-            label="Company name"
+            label={t('auth.companyName')}
             required
             autoComplete="organization"
             value={form.companyName}
             onChange={update('companyName')}
             error={fieldErrors.companyname}
-            placeholder="Bennaya Contracting"
+            placeholder={t('auth.companyNamePlaceholder')}
           />
 
           <Input
-            label="Email"
+            label={t('auth.email')}
             type="email"
             inputMode="email"
             autoComplete="email"
@@ -99,25 +104,25 @@ export function RegisterPage() {
           />
 
           <Input
-            label="Password"
+            label={t('auth.password')}
             type="password"
             autoComplete="new-password"
             required
             value={form.password}
             onChange={update('password')}
             error={fieldErrors.password}
-            hint="At least 8 characters"
+            hint={t('auth.passwordHint')}
           />
 
           <Button type="submit" isLoading={isSubmitting} className="w-full">
-            Create account
+            {t('auth.createAccount')}
           </Button>
         </form>
 
         <p className="mt-5 text-center text-sm text-slate-600">
-          Already have an account?{' '}
+          {t('auth.haveAccount')}{' '}
           <Link to="/login" className="font-medium text-slate-900 underline underline-offset-4">
-            Sign in
+            {t('auth.signIn')}
           </Link>
         </p>
       </div>

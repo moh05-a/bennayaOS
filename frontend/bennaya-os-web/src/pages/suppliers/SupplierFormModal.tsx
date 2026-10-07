@@ -6,6 +6,7 @@ import { Input } from '../../components/ui/Input'
 import { Modal } from '../../components/ui/Modal'
 import { suppliersApi } from '../../services/suppliersApi'
 import { ApiError } from '../../services/api'
+import { useLanguage } from '../../hooks/useLanguage'
 import type { Supplier } from '../../types/supplier'
 
 interface SupplierFormModalProps {
@@ -18,6 +19,7 @@ const EMPTY_FORM = { name: '', phone: '', email: '' }
 
 export function SupplierFormModal({ isOpen, supplier, onClose }: SupplierFormModalProps) {
   const queryClient = useQueryClient()
+  const { t } = useLanguage()
   const [form, setForm] = useState(EMPTY_FORM)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
@@ -52,7 +54,7 @@ export function SupplierFormModal({ isOpen, supplier, onClose }: SupplierFormMod
         if (Object.keys(errors).length > 0) setFieldErrors(errors)
         else setFormError(error.message)
       } else {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('errors.generic'))
       }
     },
   })
@@ -68,22 +70,26 @@ export function SupplierFormModal({ isOpen, supplier, onClose }: SupplierFormMod
   }
 
   return (
-    <Modal isOpen={isOpen} title={supplier ? 'Edit supplier' : 'Add supplier'} onClose={onClose}>
+    <Modal
+      isOpen={isOpen}
+      title={supplier ? t('suppliers.edit') : t('suppliers.add')}
+      onClose={onClose}
+    >
       <form onSubmit={handleSubmit} className="space-y-4">
         {formError && <ErrorMessage message={formError} />}
 
         <Input
-          label="Name"
+          label={t('fields.name')}
           required
           autoFocus
           value={form.name}
           onChange={update('name')}
           error={fieldErrors.name}
-          placeholder="Amman Cement Co"
+          placeholder={t('suppliers.namePlaceholder')}
         />
 
         <Input
-          label="Phone"
+          label={t('fields.phone')}
           type="tel"
           inputMode="tel"
           value={form.phone}
@@ -93,7 +99,7 @@ export function SupplierFormModal({ isOpen, supplier, onClose }: SupplierFormMod
         />
 
         <Input
-          label="Email"
+          label={t('fields.email')}
           type="email"
           inputMode="email"
           value={form.email}
@@ -104,10 +110,10 @@ export function SupplierFormModal({ isOpen, supplier, onClose }: SupplierFormMod
 
         <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
           <Button type="button" variant="secondary" onClick={onClose} disabled={mutation.isPending}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" isLoading={mutation.isPending}>
-            {supplier ? 'Save changes' : 'Add supplier'}
+            {supplier ? t('common.saveChanges') : t('suppliers.add')}
           </Button>
         </div>
       </form>

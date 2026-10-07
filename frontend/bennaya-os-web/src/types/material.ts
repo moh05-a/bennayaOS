@@ -8,21 +8,20 @@ export type MaterialUnit =
   | 'Piece'
   | 'Liter'
 
-/** Short labels for display; full names for the dropdown. */
-export const MATERIAL_UNITS: { value: MaterialUnit; label: string; short: string }[] = [
-  { value: 'Bag', label: 'Bag', short: 'bag' },
-  { value: 'Kg', label: 'Kilogram', short: 'kg' },
-  { value: 'Ton', label: 'Ton', short: 'ton' },
-  { value: 'Meter', label: 'Meter', short: 'm' },
-  { value: 'SquareMeter', label: 'Square meter', short: 'm\u00b2' },
-  { value: 'CubicMeter', label: 'Cubic meter', short: 'm\u00b3' },
-  { value: 'Piece', label: 'Piece', short: 'pc' },
-  { value: 'Liter', label: 'Liter', short: 'L' },
+/**
+ * Labels are translated: full names via t(`materialUnit.${unit}`) for the
+ * dropdown, short forms via t(`materialUnitShort.${unit}`) next to numbers.
+ */
+export const MATERIAL_UNITS: MaterialUnit[] = [
+  'Bag',
+  'Kg',
+  'Ton',
+  'Meter',
+  'SquareMeter',
+  'CubicMeter',
+  'Piece',
+  'Liter',
 ]
-
-export function unitShort(unit: MaterialUnit): string {
-  return MATERIAL_UNITS.find((u) => u.value === unit)?.short ?? unit
-}
 
 export interface Material {
   id: string

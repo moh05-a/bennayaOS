@@ -9,11 +9,11 @@ import { expensesApi } from '../../services/expensesApi'
 import { ApiError } from '../../services/api'
 import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
-import { formatDate } from '../../utils/format'
-import type { Expense } from '../../types/expense'
+import { useLanguage } from '../../hooks/useLanguage'
+import type { Expense, ExpenseCategory } from '../../types/expense'
 import { ExpenseFormModal } from './ExpenseFormModal'
 
-const CATEGORY_STYLES: Record<string, string> = {
+const CATEGORY_STYLES: Record<ExpenseCategory, string> = {
   Materials: 'bg-blue-50 text-blue-700',
   Labor: 'bg-purple-50 text-purple-700',
   Equipment: 'bg-amber-50 text-amber-700',
@@ -22,14 +22,16 @@ const CATEGORY_STYLES: Record<string, string> = {
   Other: 'bg-slate-100 text-slate-700',
 }
 
-function CategoryTag({ category }: { category: string }) {
+function CategoryTag({ category }: { category: ExpenseCategory }) {
+  const { t } = useLanguage()
+
   return (
     <span
       className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
         CATEGORY_STYLES[category] ?? CATEGORY_STYLES.Other
       }`}
     >
-      {category}
+      {t(`expenseCategory.${category}`)}
     </span>
   )
 }
@@ -37,6 +39,7 @@ function CategoryTag({ category }: { category: string }) {
 export function ExpensesTab({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient()
   const { format } = useCurrency()
+  const { t, formatDate } = useLanguage()
 
   const [editing, setEditing] = useState<Expense | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -57,7 +60,7 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
     },
     onError: (caught: unknown) => {
       setDeleteError(
-        caught instanceof ApiError ? caught.message : 'Could not delete this expense.',
+        caught instanceof ApiError ? caught.message : t('expenses.deleteError'),
       )
     },
   })
@@ -72,12 +75,12 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
     setIsFormOpen(true)
   }
 
-  if (isPending) return <Spinner label="Loading expenses" />
+  if (isPending) return <Spinner label={t('expenses.loading')} />
 
   if (isError) {
     return (
       <ErrorMessage
-        message={error instanceof ApiError ? error.message : 'Could not load expenses.'}
+        message={error instanceof ApiError ? error.message : t('expenses.loadError')}
       />
     )
   }
@@ -89,7 +92,7 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-            Total spent
+            {t('money.totalSpent')}
           </p>
           {/* This number comes from SUM() in PostgreSQL, not from adding up the
               rows below - so it stays correct once the list is paginated. */}
@@ -97,7 +100,7 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
             {format(totalAmount)}
           </p>
         </div>
-        <Button onClick={openCreate}>Add expense</Button>
+        <Button onClick={openCreate}>{t('expenses.add')}</Button>
       </div>
 
       {totalsByCategory.length > 0 && (
@@ -107,7 +110,7 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
               key={entry.category}
               className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm"
             >
-              <p className="text-xs text-slate-500">{entry.category}</p>
+              <p className="text-xs text-slate-500">{t(`expenseCategory.${entry.category}`)}</p>
               <p className="text-sm font-semibold tabular-nums text-slate-900">
                 {format(entry.amount)}
               </p>
@@ -118,9 +121,9 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
 
       {items.length === 0 ? (
         <EmptyState
-          title="No expenses yet"
-          description="Record what you spend on this project to track where the money goes."
-          action={<Button onClick={openCreate}>Add expense</Button>}
+          title={t('expenses.emptyTitle')}
+          description={t('expenses.emptyDescription')}
+          action={<Button onClick={openCreate}>{t('expenses.add')}</Button>}
         />
       ) : (
         <>
@@ -150,10 +153,10 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
 
                 <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
                   <Button variant="secondary" onClick={() => openEdit(expense)} className="flex-1">
-                    Edit
+                    {t('common.edit')}
                   </Button>
                   <Button variant="ghost" onClick={() => setDeleting(expense)} className="flex-1">
-                    Delete
+                    {t('common.delete')}
                   </Button>
                 </div>
               </li>
@@ -162,15 +165,15 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
 
           {/* DESKTOP: table */}
           <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm sm:block">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Date</th>
-                  <th className="px-4 py-3 font-medium">Category</th>
-                  <th className="px-4 py-3 font-medium">Description</th>
-                  <th className="px-4 py-3 font-medium">Supplier</th>
-                  <th className="px-4 py-3 text-right font-medium">Amount</th>
-                  <th className="px-4 py-3 text-right font-medium">Actions</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.date')}</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.category')}</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.description')}</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.supplier')}</th>
+                  <th className="px-4 py-3 text-end font-medium">{t('fields.amount')}</th>
+                  <th className="px-4 py-3 text-end font-medium">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -184,16 +187,16 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
                     </td>
                     <td className="px-4 py-3 text-slate-600">{expense.description ?? '-'}</td>
                     <td className="px-4 py-3 text-slate-600">{expense.supplierName ?? '-'}</td>
-                    <td className="px-4 py-3 text-right font-medium tabular-nums text-slate-900">
+                    <td className="px-4 py-3 text-end font-medium tabular-nums text-slate-900">
                       {format(expense.amount)}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">
                         <Button variant="ghost" onClick={() => openEdit(expense)}>
-                          Edit
+                          {t('common.edit')}
                         </Button>
                         <Button variant="ghost" onClick={() => setDeleting(expense)}>
-                          Delete
+                          {t('common.delete')}
                         </Button>
                       </div>
                     </td>
@@ -203,9 +206,9 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
               <tfoot className="border-t border-slate-200 bg-slate-50">
                 <tr>
                   <td colSpan={4} className="px-4 py-3 text-sm font-medium text-slate-600">
-                    Total
+                    {t('common.total')}
                   </td>
-                  <td className="px-4 py-3 text-right text-sm font-semibold tabular-nums text-slate-900">
+                  <td className="px-4 py-3 text-end text-sm font-semibold tabular-nums text-slate-900">
                     {format(totalAmount)}
                   </td>
                   <td />
@@ -225,10 +228,10 @@ export function ExpensesTab({ projectId }: { projectId: string }) {
 
       <ConfirmDialog
         isOpen={deleting !== null}
-        title="Delete expense"
+        title={t('expenses.deleteTitle')}
         message={
           deleteError ??
-          `Delete this ${deleting ? format(deleting.amount) : ''} expense? This cannot be undone.`
+          t('expenses.deleteConfirm', { amount: deleting ? format(deleting.amount) : '' })
         }
         isLoading={deleteMutation.isPending}
         onConfirm={() => deleting && deleteMutation.mutate(deleting.id)}

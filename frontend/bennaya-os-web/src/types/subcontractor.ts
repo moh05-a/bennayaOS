@@ -41,14 +41,18 @@ export interface SubcontractorPaymentInput {
   description?: string | null
 }
 
-/** Quick picks in the form. Specialty is free text, so this is only a shortcut. */
+/**
+ * Quick picks in the form. Specialty is free text, so this is only a shortcut.
+ * These are dictionary keys: the text filled in is t(`trades.${trade}`), so it
+ * is saved in whatever language the user is working in.
+ */
 export const COMMON_TRADES = [
-  'Electrician',
-  'Plumber',
-  'Painter',
-  'Carpenter',
-  'Tiler',
-  'HVAC',
-  'Steel fixer',
-  'Mason',
-]
+  'electrician',
+  'plumber',
+  'painter',
+  'carpenter',
+  'tiler',
+  'hvac',
+  'steelFixer',
+  'mason',
+] as const

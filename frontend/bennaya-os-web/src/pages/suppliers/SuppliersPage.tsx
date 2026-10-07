@@ -9,12 +9,14 @@ import { Spinner } from '../../components/ui/Spinner'
 import { suppliersApi } from '../../services/suppliersApi'
 import { ApiError } from '../../services/api'
 import { useCurrency } from '../../hooks/useCurrency'
+import { useLanguage } from '../../hooks/useLanguage'
 import type { Supplier } from '../../types/supplier'
 import { SupplierFormModal } from './SupplierFormModal'
 
 export function SuppliersPage() {
   const queryClient = useQueryClient()
   const { format } = useCurrency()
+  const { t } = useLanguage()
 
   const [editing, setEditing] = useState<Supplier | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -38,7 +40,7 @@ export function SuppliersPage() {
     },
     onError: (caught: unknown) => {
       setDeleteError(
-        caught instanceof ApiError ? caught.message : 'Could not delete this supplier.',
+        caught instanceof ApiError ? caught.message : t('suppliers.deleteError'),
       )
     },
   })
@@ -56,32 +58,34 @@ export function SuppliersPage() {
   // Spelling out the consequence beats a generic "are you sure?".
   const deleteMessage = (supplier: Supplier) =>
     supplier.expenseCount > 0
-      ? `Delete "${supplier.name}"? Its ${supplier.expenseCount} expense(s) worth ${format(
-          supplier.totalSpent,
-        )} will be kept, but will no longer show a supplier.`
-      : `Delete "${supplier.name}"? This cannot be undone.`
+      ? t('suppliers.deleteWithExpenses', {
+          name: supplier.name,
+          count: supplier.expenseCount,
+          amount: format(supplier.totalSpent),
+        })
+      : t('common.confirmDelete', { name: supplier.name })
 
   return (
     <div className="mx-auto max-w-5xl">
       <PageHeader
-        title="Suppliers"
-        description="The businesses you buy materials and services from."
-        action={<Button onClick={openCreate}>Add supplier</Button>}
+        title={t('suppliers.title')}
+        description={t('suppliers.description')}
+        action={<Button onClick={openCreate}>{t('suppliers.add')}</Button>}
       />
 
-      {isPending && <Spinner label="Loading suppliers" />}
+      {isPending && <Spinner label={t('suppliers.loading')} />}
 
       {isError && (
         <ErrorMessage
-          message={error instanceof ApiError ? error.message : 'Could not load suppliers.'}
+          message={error instanceof ApiError ? error.message : t('suppliers.loadError')}
         />
       )}
 
       {suppliers && suppliers.length === 0 && (
         <EmptyState
-          title="No suppliers yet"
-          description="Add your suppliers so you can tag expenses and see how much you spend with each one."
-          action={<Button onClick={openCreate}>Add supplier</Button>}
+          title={t('suppliers.emptyTitle')}
+          description={t('suppliers.emptyDescription')}
+          action={<Button onClick={openCreate}>{t('suppliers.add')}</Button>}
         />
       )}
 
@@ -102,29 +106,29 @@ export function SuppliersPage() {
                         href={`tel:${supplier.phone}`}
                         className="mt-0.5 block text-sm text-slate-600 underline underline-offset-2"
                       >
-                        {supplier.phone}
+                        <span dir="ltr">{supplier.phone}</span>
                       </a>
                     )}
                     {supplier.email && (
                       <p className="truncate text-sm text-slate-500">{supplier.email}</p>
                     )}
                   </div>
-                  <div className="shrink-0 text-right">
+                  <div className="shrink-0 text-end">
                     <p className="text-sm font-semibold tabular-nums text-slate-900">
                       {format(supplier.totalSpent)}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {supplier.expenseCount} expense{supplier.expenseCount === 1 ? '' : 's'}
+                      {t('suppliers.expenseCount', { count: supplier.expenseCount })}
                     </p>
                   </div>
                 </div>
 
                 <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
                   <Button variant="secondary" onClick={() => openEdit(supplier)} className="flex-1">
-                    Edit
+                    {t('common.edit')}
                   </Button>
                   <Button variant="ghost" onClick={() => setDeleting(supplier)} className="flex-1">
-                    Delete
+                    {t('common.delete')}
                   </Button>
                 </div>
               </li>
@@ -133,36 +137,38 @@ export function SuppliersPage() {
 
           {/* DESKTOP: table */}
           <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm sm:block">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Name</th>
-                  <th className="px-4 py-3 font-medium">Phone</th>
-                  <th className="px-4 py-3 font-medium">Email</th>
-                  <th className="px-4 py-3 text-right font-medium">Expenses</th>
-                  <th className="px-4 py-3 text-right font-medium">Total spent</th>
-                  <th className="px-4 py-3 text-right font-medium">Actions</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.name')}</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.phone')}</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.email')}</th>
+                  <th className="px-4 py-3 text-end font-medium">{t('suppliers.expensesColumn')}</th>
+                  <th className="px-4 py-3 text-end font-medium">{t('money.totalSpent')}</th>
+                  <th className="px-4 py-3 text-end font-medium">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {suppliers.map((supplier) => (
                   <tr key={supplier.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-medium text-slate-900">{supplier.name}</td>
-                    <td className="px-4 py-3 text-slate-600">{supplier.phone ?? '-'}</td>
+                    <td className="px-4 py-3 text-slate-600">
+                      <span dir="ltr">{supplier.phone ?? '-'}</span>
+                    </td>
                     <td className="px-4 py-3 text-slate-600">{supplier.email ?? '-'}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-slate-600">
+                    <td className="px-4 py-3 text-end tabular-nums text-slate-600">
                       {supplier.expenseCount}
                     </td>
-                    <td className="px-4 py-3 text-right font-medium tabular-nums text-slate-900">
+                    <td className="px-4 py-3 text-end font-medium tabular-nums text-slate-900">
                       {format(supplier.totalSpent)}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">
                         <Button variant="ghost" onClick={() => openEdit(supplier)}>
-                          Edit
+                          {t('common.edit')}
                         </Button>
                         <Button variant="ghost" onClick={() => setDeleting(supplier)}>
-                          Delete
+                          {t('common.delete')}
                         </Button>
                       </div>
                     </td>
@@ -182,7 +188,7 @@ export function SuppliersPage() {
 
       <ConfirmDialog
         isOpen={deleting !== null}
-        title="Delete supplier"
+        title={t('suppliers.deleteTitle')}
         message={deleteError ?? (deleting ? deleteMessage(deleting) : '')}
         isLoading={deleteMutation.isPending}
         onConfirm={() => deleting && deleteMutation.mutate(deleting.id)}

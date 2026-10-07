@@ -128,9 +128,12 @@ public class ClientService : IClientService
 
         if (projectCount > 0)
         {
+            // A template plus argument (not an interpolated string), so the
+            // text can be translated before the count is filled in.
             throw new ConflictException(
-                $"This client has {projectCount} project(s) and cannot be deleted. " +
-                "Delete or reassign those projects first.");
+                "This client has {0} project(s) and cannot be deleted. " +
+                "Delete or reassign those projects first.",
+                projectCount);
         }
 
         _db.Clients.Remove(client);

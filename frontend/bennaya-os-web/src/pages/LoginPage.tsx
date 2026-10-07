@@ -3,11 +3,14 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { ErrorMessage } from '../components/ui/ErrorMessage'
+import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { useAuth } from '../hooks/useAuth'
+import { useLanguage } from '../hooks/useLanguage'
 import { ApiError } from '../services/api'
 
 export function LoginPage() {
   const { login, isAuthenticated } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -31,7 +34,7 @@ export function LoginPage() {
       navigate(from ?? '/dashboard', { replace: true })
     } catch (caught) {
       setError(
-        caught instanceof ApiError ? caught.message : 'Something went wrong. Please try again.',
+        caught instanceof ApiError ? caught.message : t('errors.generic'),
       )
     } finally {
       setIsSubmitting(false)
@@ -39,11 +42,13 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
+    <div className="relative flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
+      <LanguageSwitcher className="absolute end-4 top-4" />
+
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold text-slate-900">BennayaOS</h1>
-          <p className="mt-1 text-sm text-slate-500">Sign in to your account</p>
+          <p className="mt-1 text-sm text-slate-500">{t('auth.signInSubtitle')}</p>
         </div>
 
         <form
@@ -53,7 +58,7 @@ export function LoginPage() {
           {error && <ErrorMessage message={error} />}
 
           <Input
-            label="Email"
+            label={t('auth.email')}
             type="email"
             // inputMode + autoComplete make phone keyboards and password
             // managers behave correctly - small details contractors notice.
@@ -66,7 +71,7 @@ export function LoginPage() {
           />
 
           <Input
-            label="Password"
+            label={t('auth.password')}
             type="password"
             autoComplete="current-password"
             required
@@ -76,14 +81,14 @@ export function LoginPage() {
           />
 
           <Button type="submit" isLoading={isSubmitting} className="w-full">
-            Sign in
+            {t('auth.signIn')}
           </Button>
         </form>
 
         <p className="mt-5 text-center text-sm text-slate-600">
-          Don&apos;t have an account?{' '}
+          {t('auth.noAccount')}{' '}
           <Link to="/register" className="font-medium text-slate-900 underline underline-offset-4">
-            Create one
+            {t('auth.createOne')}
           </Link>
         </p>
       </div>

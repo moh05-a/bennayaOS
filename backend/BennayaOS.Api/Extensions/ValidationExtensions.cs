@@ -1,4 +1,6 @@
+using BennayaOS.Api.Resources;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace BennayaOS.Api.Extensions;
 
@@ -16,6 +18,11 @@ public static class ValidationExtensions
     /// That leaks our namespace layout to anyone poking at the API and means
     /// nothing to a contractor. We replace those with a plain message and keep
     /// our own validation messages untouched.
+    ///
+    /// Every message is also passed through the localizer. Attribute messages
+    /// arrive already translated (see AddAppLocalization), so for them the
+    /// lookup finds nothing and returns the text unchanged; this pass catches
+    /// the rest, such as IValidatableObject messages and our own fallbacks.
     /// </summary>
     public static IServiceCollection AddCleanValidationResponses(this IServiceCollection services)
     {
@@ -23,6 +30,9 @@ public static class ValidationExtensions
         {
             options.InvalidModelStateResponseFactory = context =>
             {
+                var localizer = context.HttpContext.RequestServices
+                    .GetRequiredService<IStringLocalizer<SharedResource>>();
+
                 var modelStateEntries = context.ModelState
                     .Where(entry => entry.Value?.Errors.Count > 0)
                     .ToList();
@@ -42,14 +52,14 @@ public static class ValidationExtensions
                     .ToDictionary(
                         entry => CleanFieldName(entry.Key),
                         entry => entry.Value!.Errors
-                            .Select(error => CleanMessage(error.ErrorMessage))
+                            .Select(error => (string)localizer[CleanMessage(error.ErrorMessage)])
                             .Distinct()
                             .ToArray());
 
                 var problem = new ValidationProblemDetails(errors)
                 {
                     Status = StatusCodes.Status400BadRequest,
-                    Title = "One or more fields are invalid.",
+                    Title = localizer["One or more fields are invalid."],
                     Instance = context.HttpContext.Request.Path,
                 };
 

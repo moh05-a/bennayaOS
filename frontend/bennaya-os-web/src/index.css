@@ -5,7 +5,20 @@
   Design tokens for BennayaOS.
   Defining them here (instead of scattering hex codes through components)
   means rebranding later is a change to this file only.
+
+  Inter has no Arabic glyphs, so Arabic text falls through to the system UI
+  font (Segoe UI on Windows, SF Arabic on Apple, Noto on Android), all of
+  which render Arabic well.
 */
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, "Segoe UI", Tahoma, sans-serif;
+}
+
+/*
+  Arabic letters join to each other; letter-spacing pulls them apart and makes
+  words hard to read. Labels use tracking-wide for English small caps, so turn
+  it off for Arabic. Unlayered CSS beats Tailwind's layered utilities.
+*/
+:lang(ar) .tracking-wide {
+  letter-spacing: normal;
 }

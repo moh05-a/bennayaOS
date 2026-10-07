@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic translations for every message the API returns to the user.
+  name  = the exact English text used in code (it is the lookup key).
+  value = the Arabic text sent when the request has "Accept-Language: ar".
+  {0}, {1}, {2} placeholders must be kept as-is.
+-->
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- General errors -->
+  <data name="Authentication required." xml:space="preserve">
+    <value>يجب تسجيل الدخول أولاً.</value>
+  </data>
+  <data name="An unexpected error occurred." xml:space="preserve">
+    <value>حدث خطأ غير متوقع.</value>
+  </data>
+  <data name="One or more fields are invalid." xml:space="preserve">
+    <value>بعض الحقول غير صالحة.</value>
+  </data>
+  <data name="This value is not valid." xml:space="preserve">
+    <value>هذه القيمة غير صالحة.</value>
+  </data>
+
+  <!-- Default validation messages (DefaultValidationMessagesProvider) -->
+  <data name="This field is required." xml:space="preserve">
+    <value>هذا الحقل مطلوب.</value>
+  </data>
+  <data name="Must be {1} characters or fewer." xml:space="preserve">
+    <value>يجب ألا يتجاوز {1} حرفًا.</value>
+  </data>
+  <data name="Must be between {2} and {1} characters." xml:space="preserve">
+    <value>يجب أن يكون بين {2} و{1} حرفًا.</value>
+  </data>
+  <data name="Must be exactly {1} characters." xml:space="preserve">
+    <value>يجب أن يتكون من {1} أحرف بالضبط.</value>
+  </data>
+
+  <!-- Auth -->
+  <data name="An account with this email already exists." xml:space="preserve">
+    <value>يوجد حساب مسجّل بهذا البريد الإلكتروني بالفعل.</value>
+  </data>
+  <data name="Invalid email or password." xml:space="preserve">
+    <value>البريد الإلكتروني أو كلمة المرور غير صحيحة.</value>
+  </data>
+  <data name="Full name is required." xml:space="preserve">
+    <value>الاسم الكامل مطلوب.</value>
+  </data>
+  <data name="Company name is required." xml:space="preserve">
+    <value>اسم الشركة مطلوب.</value>
+  </data>
+  <data name="Email is required." xml:space="preserve">
+    <value>البريد الإلكتروني مطلوب.</value>
+  </data>
+  <data name="Enter a valid email address." xml:space="preserve">
+    <value>أدخل بريدًا إلكترونيًا صحيحًا.</value>
+  </data>
+  <data name="Password is required." xml:space="preserve">
+    <value>كلمة المرور مطلوبة.</value>
+  </data>
+  <data name="Password must be at least 8 characters." xml:space="preserve">
+    <value>يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.</value>
+  </data>
+  <data name="Enter a valid phone number." xml:space="preserve">
+    <value>أدخل رقم هاتف صحيحًا.</value>
+  </data>
+
+  <!-- Not found -->
+  <data name="Company not found." xml:space="preserve">
+    <value>الشركة غير موجودة.</value>
+  </data>
+  <data name="Client not found." xml:space="preserve">
+    <value>العميل غير موجود.</value>
+  </data>
+  <data name="The selected client was not found." xml:space="preserve">
+    <value>العميل المختار غير موجود.</value>
+  </data>
+  <data name="Project not found." xml:space="preserve">
+    <value>المشروع غير موجود.</value>
+  </data>
+  <data name="Expense not found." xml:space="preserve">
+    <value>المصروف غير موجود.</value>
+  </data>
+  <data name="Payment not found." xml:space="preserve">
+    <value>الدفعة غير موجودة.</value>
+  </data>
+  <data name="Supplier not found." xml:space="preserve">
+    <value>المورّد غير موجود.</value>
+  </data>
+  <data name="The selected supplier was not found." xml:space="preserve">
+    <value>المورّد المختار غير موجود.</value>
+  </data>
+  <data name="Subcontractor not found." xml:space="preserve">
+    <value>المقاول الفرعي غير موجود.</value>
+  </data>
+  <data name="Material not found." xml:space="preserve">
+    <value>المادة غير موجودة.</value>
+  </data>
+  <data name="Task not found." xml:space="preserve">
+    <value>المهمة غير موجودة.</value>
+  </data>
+
+  <!-- Clients -->
+  <data name="Client name is required." xml:space="preserve">
+    <value>اسم العميل مطلوب.</value>
+  </data>
+  <data name="This client has {0} project(s) and cannot be deleted. Delete or reassign those projects first." xml:space="preserve">
+    <value>لا يمكن حذف هذا العميل لأنه مرتبط بمشاريع (العدد: {0}). احذف هذه المشاريع أو انقلها إلى عميل آخر أولاً.</value>
+  </data>
+
+  <!-- Projects -->
+  <data name="Project name is required." xml:space="preserve">
+    <value>اسم المشروع مطلوب.</value>
+  </data>
+  <data name="Contract value cannot be negative." xml:space="preserve">
+    <value>لا يمكن أن تكون قيمة العقد سالبة.</value>
+  </data>
+  <data name="Please choose a client." xml:space="preserve">
+    <value>يرجى اختيار العميل.</value>
+  </data>
+  <data name="Expected end date cannot be before the start date." xml:space="preserve">
+    <value>لا يمكن أن يكون تاريخ الانتهاء المتوقع قبل تاريخ البدء.</value>
+  </data>
+
+  <!-- Expenses and payments -->
+  <data name="Amount must be greater than zero." xml:space="preserve">
+    <value>يجب أن يكون المبلغ أكبر من صفر.</value>
+  </data>
+  <data name="Please choose a category." xml:space="preserve">
+    <value>يرجى اختيار الفئة.</value>
+  </data>
+  <data name="Date is required." xml:space="preserve">
+    <value>التاريخ مطلوب.</value>
+  </data>
+
+  <!-- Suppliers and subcontractors -->
+  <data name="Supplier name is required." xml:space="preserve">
+    <value>اسم المورّد مطلوب.</value>
+  </data>
+  <data name="Name is required." xml:space="preserve">
+    <value>الاسم مطلوب.</value>
+  </data>
+  <data name="Contract amount cannot be negative." xml:space="preserve">
+    <value>لا يمكن أن يكون مبلغ العقد سالبًا.</value>
+  </data>
+
+  <!-- Materials -->
+  <data name="Material name is required." xml:space="preserve">
+    <value>اسم المادة مطلوب.</value>
+  </data>
+  <data name="Please choose a unit." xml:space="preserve">
+    <value>يرجى اختيار الوحدة.</value>
+  </data>
+  <data name="Required quantity cannot be negative." xml:space="preserve">
+    <value>لا يمكن أن تكون الكمية المطلوبة سالبة.</value>
+  </data>
+  <data name="Purchased quantity cannot be negative." xml:space="preserve">
+    <value>لا يمكن أن تكون الكمية المشتراة سالبة.</value>
+  </data>
+  <data name="Used quantity cannot be negative." xml:space="preserve">
+    <value>لا يمكن أن تكون الكمية المستخدمة سالبة.</value>
+  </data>
+  <data name="Unit cost cannot be negative." xml:space="preserve">
+    <value>لا يمكن أن تكون تكلفة الوحدة سالبة.</value>
+  </data>
+
+  <!-- Tasks -->
+  <data name="Title is required." xml:space="preserve">
+    <value>العنوان مطلوب.</value>
+  </data>
+</root>

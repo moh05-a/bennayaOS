@@ -6,13 +6,14 @@ export type ExpenseCategory =
   | 'Subcontractor'
   | 'Other'
 
-export const EXPENSE_CATEGORIES: { value: ExpenseCategory; label: string }[] = [
-  { value: 'Materials', label: 'Materials' },
-  { value: 'Labor', label: 'Labor' },
-  { value: 'Equipment', label: 'Equipment' },
-  { value: 'Transportation', label: 'Transportation' },
-  { value: 'Subcontractor', label: 'Subcontractor' },
-  { value: 'Other', label: 'Other' },
+/** Labels are translated: t(`expenseCategory.${category}`). */
+export const EXPENSE_CATEGORIES: ExpenseCategory[] = [
+  'Materials',
+  'Labor',
+  'Equipment',
+  'Transportation',
+  'Subcontractor',
+  'Other',
 ]
 
 export interface Expense {
@@ -30,7 +31,7 @@ export interface Expense {
 }
 
 export interface CategoryTotal {
-  category: string
+  category: ExpenseCategory
   amount: number
 }
 

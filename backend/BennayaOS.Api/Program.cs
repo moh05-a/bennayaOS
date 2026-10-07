@@ -106,19 +106,30 @@ builder.Services.AddControllers()
         // The frontend then works with readable values, and reordering the enum
         // cannot silently change what an API response means.
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
+    })
+    // Validation messages come back in the caller's language.
+    .AddAppValidationLocalization();
 builder.Services.AddOpenApiWithAuth();
 
 // Strips internal .NET type names out of automatic 400 responses.
 builder.Services.AddCleanValidationResponses();
 
+// ---------------------------------------------------------------------------
+// 7. Localization (English / Arabic, chosen by the Accept-Language header)
+// ---------------------------------------------------------------------------
+builder.Services.AddAppLocalization();
+
 var app = builder.Build();
 
 // ---------------------------------------------------------------------------
-// 7. HTTP pipeline (order matters - each piece wraps the next)
+// 8. HTTP pipeline (order matters - each piece wraps the next)
 // ---------------------------------------------------------------------------
 
-// First, so it can catch exceptions thrown by everything after it.
+// Before the exception handler, so that error responses are translated too:
+// the language is set on the way in, and the handler runs inside that scope.
+app.UseRequestLocalization();
+
+// Catches exceptions thrown by everything after it.
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())

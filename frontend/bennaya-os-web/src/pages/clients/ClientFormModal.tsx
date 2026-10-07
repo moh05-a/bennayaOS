@@ -6,6 +6,7 @@ import { ErrorMessage } from '../../components/ui/ErrorMessage'
 import { Modal } from '../../components/ui/Modal'
 import { clientsApi } from '../../services/clientsApi'
 import { ApiError } from '../../services/api'
+import { useLanguage } from '../../hooks/useLanguage'
 import type { Client } from '../../types/client'
 
 interface ClientFormModalProps {
@@ -19,6 +20,7 @@ const EMPTY_FORM = { name: '', phone: '', email: '' }
 
 export function ClientFormModal({ isOpen, client, onClose }: ClientFormModalProps) {
   const queryClient = useQueryClient()
+  const { t } = useLanguage()
   const [form, setForm] = useState(EMPTY_FORM)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
@@ -58,7 +60,7 @@ export function ClientFormModal({ isOpen, client, onClose }: ClientFormModalProp
         if (Object.keys(errors).length > 0) setFieldErrors(errors)
         else setFormError(error.message)
       } else {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('errors.generic'))
       }
     },
   })
@@ -74,22 +76,22 @@ export function ClientFormModal({ isOpen, client, onClose }: ClientFormModalProp
   }
 
   return (
-    <Modal isOpen={isOpen} title={client ? 'Edit client' : 'Add client'} onClose={onClose}>
+    <Modal isOpen={isOpen} title={client ? t('clients.edit') : t('clients.add')} onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
         {formError && <ErrorMessage message={formError} />}
 
         <Input
-          label="Name"
+          label={t('fields.name')}
           required
           autoFocus
           value={form.name}
           onChange={update('name')}
           error={fieldErrors.name}
-          placeholder="Abu Ahmad"
+          placeholder={t('clients.namePlaceholder')}
         />
 
         <Input
-          label="Phone"
+          label={t('fields.phone')}
           type="tel"
           inputMode="tel"
           value={form.phone}
@@ -99,7 +101,7 @@ export function ClientFormModal({ isOpen, client, onClose }: ClientFormModalProp
         />
 
         <Input
-          label="Email"
+          label={t('fields.email')}
           type="email"
           inputMode="email"
           value={form.email}
@@ -110,10 +112,10 @@ export function ClientFormModal({ isOpen, client, onClose }: ClientFormModalProp
 
         <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
           <Button type="button" variant="secondary" onClick={onClose} disabled={mutation.isPending}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" isLoading={mutation.isPending}>
-            {client ? 'Save changes' : 'Add client'}
+            {client ? t('common.saveChanges') : t('clients.add')}
           </Button>
         </div>
       </form>

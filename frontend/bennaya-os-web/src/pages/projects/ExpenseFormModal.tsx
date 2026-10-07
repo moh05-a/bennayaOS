@@ -10,6 +10,7 @@ import { suppliersApi } from '../../services/suppliersApi'
 import { ApiError } from '../../services/api'
 import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
+import { useLanguage } from '../../hooks/useLanguage'
 import { todayIsoDate } from '../../utils/format'
 import { EXPENSE_CATEGORIES } from '../../types/expense'
 import type { Expense, ExpenseCategory } from '../../types/expense'
@@ -25,6 +26,7 @@ interface ExpenseFormModalProps {
 export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: ExpenseFormModalProps) {
   const queryClient = useQueryClient()
   const { currencyCode } = useCurrency()
+  const { t } = useLanguage()
 
   const [form, setForm] = useState({
     amount: '',
@@ -92,7 +94,7 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
         if (Object.keys(errors).length > 0) setFieldErrors(errors)
         else setFormError(error.message)
       } else {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('errors.generic'))
       }
     },
   })
@@ -110,12 +112,12 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
   }
 
   return (
-    <Modal isOpen={isOpen} title={expense ? 'Edit expense' : 'Add expense'} onClose={onClose}>
+    <Modal isOpen={isOpen} title={expense ? t('expenses.edit') : t('expenses.add')} onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
         {formError && <ErrorMessage message={formError} />}
 
         <Input
-          label={`Amount (${currencyCode})`}
+          label={t('expenses.amountWithCurrency', { currency: currencyCode })}
           type="number"
           step="0.001"
           min="0"
@@ -129,16 +131,16 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
         />
 
         <Select
-          label="Category"
+          label={t('fields.category')}
           required
           value={form.category}
           onChange={update('category')}
           error={fieldErrors.category}
-          options={EXPENSE_CATEGORIES.map((c) => ({ value: c.value, label: c.label }))}
+          options={EXPENSE_CATEGORIES.map((c) => ({ value: c, label: t(`expenseCategory.${c}`) }))}
         />
 
         <Input
-          label="Date"
+          label={t('fields.date')}
           type="date"
           required
           value={form.date}
@@ -147,28 +149,28 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
         />
 
         <Select
-          label="Supplier (optional)"
+          label={t('expenses.supplierOptional')}
           value={form.supplierId}
           onChange={update('supplierId')}
           error={fieldErrors.supplierid}
-          placeholder="No supplier"
+          placeholder={t('expenses.noSupplier')}
           options={(suppliers ?? []).map((s) => ({ value: s.id, label: s.name }))}
         />
 
         <Input
-          label="Description"
+          label={t('fields.description')}
           value={form.description}
           onChange={update('description')}
           error={fieldErrors.description}
-          placeholder="Cement - 250 bags"
+          placeholder={t('expenses.descriptionPlaceholder')}
         />
 
         <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
           <Button type="button" variant="secondary" onClick={onClose} disabled={mutation.isPending}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" isLoading={mutation.isPending}>
-            {expense ? 'Save changes' : 'Add expense'}
+            {expense ? t('common.saveChanges') : t('expenses.add')}
           </Button>
         </div>
       </form>

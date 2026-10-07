@@ -10,6 +10,7 @@ import { subcontractorsApi } from '../../services/subcontractorsApi'
 import { ApiError } from '../../services/api'
 import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
+import { useLanguage } from '../../hooks/useLanguage'
 import type { Subcontractor } from '../../types/subcontractor'
 import { SubcontractorFormModal } from './SubcontractorFormModal'
 import { SubcontractorPaymentsModal } from './SubcontractorPaymentsModal'
@@ -17,6 +18,7 @@ import { SubcontractorPaymentsModal } from './SubcontractorPaymentsModal'
 export function SubcontractorsTab({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient()
   const { format } = useCurrency()
+  const { t } = useLanguage()
 
   const [editing, setEditing] = useState<Subcontractor | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -38,7 +40,7 @@ export function SubcontractorsTab({ projectId }: { projectId: string }) {
     },
     onError: (caught: unknown) => {
       setDeleteError(
-        caught instanceof ApiError ? caught.message : 'Could not delete this subcontractor.',
+        caught instanceof ApiError ? caught.message : t('subcontractors.deleteError'),
       )
     },
   })
@@ -53,12 +55,12 @@ export function SubcontractorsTab({ projectId }: { projectId: string }) {
     setIsFormOpen(true)
   }
 
-  if (isPending) return <Spinner label="Loading subcontractors" />
+  if (isPending) return <Spinner label={t('subcontractors.loading')} />
 
   if (isError) {
     return (
       <ErrorMessage
-        message={error instanceof ApiError ? error.message : 'Could not load subcontractors.'}
+        message={error instanceof ApiError ? error.message : t('subcontractors.loadError')}
       />
     )
   }
@@ -74,14 +76,14 @@ export function SubcontractorsTab({ projectId }: { projectId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button onClick={openCreate}>Add subcontractor</Button>
+        <Button onClick={openCreate}>{t('subcontractors.add')}</Button>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <StatCard label="Committed" value={format(totalCommitted)} />
-        <StatCard label="Paid" value={format(totalPaid)} />
+        <StatCard label={t('subcontractors.committed')} value={format(totalCommitted)} />
+        <StatCard label={t('subcontractors.paid')} value={format(totalPaid)} />
         <StatCard
-          label="Still owed"
+          label={t('subcontractors.stillOwed')}
           value={format(totalRemaining)}
           tone={totalRemaining > 0 ? 'warning' : 'default'}
         />
@@ -89,15 +91,14 @@ export function SubcontractorsTab({ projectId }: { projectId: string }) {
 
       {/* This is the one place the double-counting rule must be visible. */}
       <p className="rounded-lg bg-slate-100 px-3 py-2 text-xs text-slate-600">
-        Record subcontractor money here, not as an expense &mdash; otherwise the same payment is
-        counted twice in this project&apos;s totals.
+        {t('subcontractors.doubleCountWarning')}
       </p>
 
       {items.length === 0 ? (
         <EmptyState
-          title="No subcontractors yet"
-          description="Add the electricians, plumbers and other trades on this project to track what you owe them."
-          action={<Button onClick={openCreate}>Add subcontractor</Button>}
+          title={t('subcontractors.emptyTitle')}
+          description={t('subcontractors.emptyDescription')}
+          action={<Button onClick={openCreate}>{t('subcontractors.add')}</Button>}
         />
       ) : (
         <ul className="space-y-3">
@@ -117,7 +118,7 @@ export function SubcontractorsTab({ projectId }: { projectId: string }) {
                   <div className="min-w-0">
                     <p className="font-medium text-slate-900">{subcontractor.name}</p>
                     <p className="text-sm text-slate-500">
-                      {subcontractor.specialty ?? 'Trade not set'}
+                      {subcontractor.specialty ?? t('subcontractors.tradeNotSet')}
                       {subcontractor.phone && (
                         <>
                           {' · '}
@@ -125,16 +126,16 @@ export function SubcontractorsTab({ projectId }: { projectId: string }) {
                             href={`tel:${subcontractor.phone}`}
                             className="underline underline-offset-2"
                           >
-                            {subcontractor.phone}
+                            <span dir="ltr">{subcontractor.phone}</span>
                           </a>
                         </>
                       )}
                     </p>
                   </div>
 
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="text-xs text-slate-500">
-                      {isOverpaid ? 'Overpaid by' : 'Remaining'}
+                      {isOverpaid ? t('money.overpaidBy') : t('subcontractors.remaining')}
                     </p>
                     <p
                       className={`text-lg font-semibold tabular-nums ${
@@ -153,11 +154,13 @@ export function SubcontractorsTab({ projectId }: { projectId: string }) {
                 <div className="mt-3">
                   <div className="flex justify-between text-xs text-slate-500">
                     <span>
-                      Paid{' '}
+                      {t('subcontractors.paid')}{' '}
                       <span className="font-medium tabular-nums text-slate-700">
                         {format(subcontractor.totalPaid)}
                       </span>{' '}
-                      of {format(subcontractor.contractAmount)}
+                      {t('subcontractors.ofAmount', {
+                        amount: format(subcontractor.contractAmount),
+                      })}
                     </span>
                     <span className="tabular-nums">{paidPercent.toFixed(0)}%</span>
                   </div>
@@ -173,13 +176,13 @@ export function SubcontractorsTab({ projectId }: { projectId: string }) {
 
                 <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-100 pt-3">
                   <Button onClick={() => setPayingTo(subcontractor)}>
-                    Payments ({subcontractor.paymentCount})
+                    {t('subcontractors.paymentsButton', { count: subcontractor.paymentCount })}
                   </Button>
                   <Button variant="secondary" onClick={() => openEdit(subcontractor)}>
-                    Edit
+                    {t('common.edit')}
                   </Button>
                   <Button variant="ghost" onClick={() => setDeleting(subcontractor)}>
-                    Delete
+                    {t('common.delete')}
                   </Button>
                 </div>
               </li>
@@ -204,12 +207,16 @@ export function SubcontractorsTab({ projectId }: { projectId: string }) {
 
       <ConfirmDialog
         isOpen={deleting !== null}
-        title="Delete subcontractor"
+        title={t('subcontractors.deleteTitle')}
         message={
           deleteError ??
           (deleting && deleting.paymentCount > 0
-            ? `Delete "${deleting.name}"? This also deletes ${deleting.paymentCount} payment(s) totalling ${format(deleting.totalPaid)}. This cannot be undone.`
-            : `Delete "${deleting?.name}"? This cannot be undone.`)
+            ? t('subcontractors.deleteWithPayments', {
+                name: deleting.name,
+                count: deleting.paymentCount,
+                amount: format(deleting.totalPaid),
+              })
+            : t('common.confirmDelete', { name: deleting?.name ?? '' }))
         }
         isLoading={deleteMutation.isPending}
         onConfirm={() => deleting && deleteMutation.mutate(deleting.id)}

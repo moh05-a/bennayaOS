@@ -1,5 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { useLanguage } from '../../hooks/useLanguage'
+import type { TranslationKey } from '../../i18n'
+import { LanguageSwitcher } from '../LanguageSwitcher'
 
 interface SidebarProps {
   isOpen: boolean
@@ -11,15 +14,16 @@ interface SidebarProps {
  * Kept deliberately short - an overcrowded sidebar is what makes construction
  * software feel like enterprise ERP.
  */
-const NAV_ITEMS = [
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/projects', label: 'Projects' },
-  { to: '/clients', label: 'Clients' },
-  { to: '/suppliers', label: 'Suppliers' },
+const NAV_ITEMS: { to: string; label: TranslationKey }[] = [
+  { to: '/dashboard', label: 'nav.dashboard' },
+  { to: '/projects', label: 'nav.projects' },
+  { to: '/clients', label: 'nav.clients' },
+  { to: '/suppliers', label: 'nav.suppliers' },
 ]
 
 export function Sidebar({ isOpen, onNavigate }: SidebarProps) {
   const { session, logout } = useAuth()
+  const { t } = useLanguage()
 
   return (
     <>
@@ -32,11 +36,13 @@ export function Sidebar({ isOpen, onNavigate }: SidebarProps) {
         />
       )}
 
+      {/* start-0 / border-e are logical sides: left in English, right in
+          Arabic. Below lg the closed drawer slides off whichever edge it sits
+          on; from lg up it is always visible, so no transform applies. */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200 bg-white
+        className={`fixed inset-y-0 start-0 z-40 flex w-64 flex-col border-e border-slate-200 bg-white
           transition-transform duration-200
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0`}
+          ${isOpen ? '' : 'max-lg:-translate-x-full max-lg:rtl:translate-x-full'}`}
       >
         <div className="flex h-14 items-center border-b border-slate-200 px-5">
           <span className="text-base font-semibold text-slate-900">BennayaOS</span>
@@ -57,7 +63,7 @@ export function Sidebar({ isOpen, onNavigate }: SidebarProps) {
                 }`
               }
             >
-              {item.label}
+              {t(item.label)}
             </NavLink>
           ))}
         </nav>
@@ -70,12 +76,14 @@ export function Sidebar({ isOpen, onNavigate }: SidebarProps) {
             <p className="truncate text-xs text-slate-500">{session?.user.email}</p>
           </div>
 
+          <LanguageSwitcher className="mt-1 w-full" />
+
           <button
             type="button"
             onClick={logout}
-            className="mt-1 block w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+            className="block w-full rounded-lg px-3 py-2.5 text-start text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
           >
-            Sign out
+            {t('nav.signOut')}
           </button>
         </div>
       </aside>

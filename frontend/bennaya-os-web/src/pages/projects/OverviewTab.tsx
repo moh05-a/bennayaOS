@@ -3,7 +3,7 @@ import { StatCard } from '../../components/ui/StatCard'
 import { expensesApi } from '../../services/expensesApi'
 import { paymentsApi } from '../../services/paymentsApi'
 import { useCurrency } from '../../hooks/useCurrency'
-import { formatDate } from '../../utils/format'
+import { useLanguage } from '../../hooks/useLanguage'
 import type { ProjectDetail } from '../../types/project'
 
 interface ProgressBarProps {
@@ -31,6 +31,7 @@ function ProgressBar({ label, percent, colorClass }: ProgressBarProps) {
 
 export function OverviewTab({ project }: { project: ProjectDetail }) {
   const { format } = useCurrency()
+  const { t, formatDate } = useLanguage()
 
   // These reuse the same query keys as the Expenses and Payments tabs, so
   // TanStack serves them from cache if those tabs were already opened - and
@@ -61,16 +62,16 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
       kind: 'expense' as const,
       date: e.date,
       amount: e.amount,
-      label: e.description ?? e.category,
-      detail: e.category,
+      label: e.description ?? t(`expenseCategory.${e.category}`),
+      detail: t(`expenseCategory.${e.category}`),
     })),
     ...(payments?.items ?? []).map((p) => ({
       id: p.id,
       kind: 'payment' as const,
       date: p.date,
       amount: p.amount,
-      label: p.description ?? 'Client payment',
-      detail: 'Payment received',
+      label: p.description ?? t('money.clientPayment'),
+      detail: t('overview.paymentReceived'),
     })),
   ]
     .sort((a, b) => b.date.localeCompare(a.date))
@@ -80,20 +81,26 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
     <div className="space-y-5">
       {/* THE FOUR NUMBERS a contractor opens the app to see. */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard label="Contract value" value={format(project.contractValue)} />
-        <StatCard label="Received" value={format(project.totalReceived)} tone="positive" />
+        <StatCard label={t('money.contractValue')} value={format(project.contractValue)} />
         <StatCard
-          label="Spent"
+          label={t('money.received')}
+          value={format(project.totalReceived)}
+          tone="positive"
+        />
+        <StatCard
+          label={t('money.spent')}
           value={format(project.totalSpent)}
           hint={
             project.totalSubcontractorPaid > 0
-              ? `incl. ${format(project.totalSubcontractorPaid)} to subcontractors`
+              ? t('overview.inclSubcontractors', {
+                  amount: format(project.totalSubcontractorPaid),
+                })
               : undefined
           }
           tone={isOverBudget ? 'warning' : 'default'}
         />
         <StatCard
-          label={isOverpaid ? 'Overpaid by' : 'Outstanding'}
+          label={isOverpaid ? t('money.overpaidBy') : t('money.outstanding')}
           value={format(Math.abs(project.outstandingBalance))}
           tone={isOverpaid ? 'positive' : 'warning'}
         />
@@ -104,7 +111,7 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Net cash position
+              {t('money.netCashPosition')}
             </p>
             <p
               className={`mt-1 text-2xl font-semibold tabular-nums ${
@@ -113,16 +120,12 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
             >
               {format(project.netCashPosition)}
             </p>
-            <p className="mt-1 max-w-md text-xs text-slate-500">
-              Received minus spent. This is cash, not profit &mdash; it excludes work you have
-              done but not yet invoiced, and costs you have committed but not yet paid.
-            </p>
+            <p className="mt-1 max-w-md text-xs text-slate-500">{t('overview.netCashHint')}</p>
           </div>
 
           {cashIsNegative && (
             <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 sm:max-w-56">
-              You have spent more than you have collected on this project. Consider invoicing
-              the next milestone.
+              {t('overview.spentMoreThanCollected')}
             </p>
           )}
         </div>
@@ -130,13 +133,13 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
         {project.totalSubcontractorRemaining > 0 && (
           <div className="mt-4 rounded-lg bg-slate-50 px-3 py-2.5">
             <p className="text-xs text-slate-600">
-              Still owed to subcontractors:{' '}
+              {t('overview.stillOwedToSubcontractors')}{' '}
               <span className="font-semibold tabular-nums text-slate-900">
                 {format(project.totalSubcontractorRemaining)}
               </span>
             </p>
             <p className="mt-0.5 text-xs text-slate-500">
-              Projected margin after that commitment:{' '}
+              {t('overview.projectedMargin')}{' '}
               <span
                 className={`font-semibold tabular-nums ${
                   project.projectedMargin < 0 ? 'text-red-700' : 'text-slate-900'
@@ -144,19 +147,19 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
               >
                 {format(project.projectedMargin)}
               </span>{' '}
-              &mdash; a ceiling, since further materials and labour are not yet recorded.
+              {t('overview.projectedMarginNote')}
             </p>
           </div>
         )}
 
         <div className="mt-5 space-y-3 border-t border-slate-100 pt-4">
           <ProgressBar
-            label="Collected from client"
+            label={t('overview.collectedFromClient')}
             percent={collectedPercent}
             colorClass="bg-emerald-500"
           />
           <ProgressBar
-            label="Spent against contract value"
+            label={t('overview.spentAgainstContract')}
             percent={spentPercent}
             colorClass={isOverBudget ? 'bg-red-500' : 'bg-slate-700'}
           />
@@ -164,9 +167,9 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
 
         {isOverBudget && (
           <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
-            Costs have exceeded the contract value by{' '}
-            {format(project.totalSpent - project.contractValue)}. This project is losing money
-            on costs alone.
+            {t('overview.overBudget', {
+              amount: format(project.totalSpent - project.contractValue),
+            })}
           </p>
         )}
       </div>
@@ -174,7 +177,7 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
       {/* Description */}
       {project.description && (
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-900">Description</h2>
+          <h2 className="text-sm font-semibold text-slate-900">{t('fields.description')}</h2>
           <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">{project.description}</p>
         </div>
       )}
@@ -182,12 +185,12 @@ export function OverviewTab({ project }: { project: ProjectDetail }) {
       {/* Recent activity across both money streams */}
       <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
         <div className="border-b border-slate-100 px-5 py-4">
-          <h2 className="text-sm font-semibold text-slate-900">Recent activity</h2>
+          <h2 className="text-sm font-semibold text-slate-900">{t('overview.recentActivity')}</h2>
         </div>
 
         {recentActivity.length === 0 ? (
           <p className="px-5 py-8 text-center text-sm text-slate-500">
-            No expenses or payments recorded yet.
+            {t('overview.noActivity')}
           </p>
         ) : (
           <ul className="divide-y divide-slate-100">

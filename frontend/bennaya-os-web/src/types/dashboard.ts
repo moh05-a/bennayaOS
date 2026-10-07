@@ -1,12 +1,15 @@
+import type { ExpenseCategory } from './expense'
+import type { ProjectStatus } from './project'
+
 export interface StatusCount {
-  status: string
+  status: ProjectStatus
   count: number
 }
 
 export interface RecentExpense {
   id: string
   amount: number
-  category: string
+  category: ExpenseCategory
   date: string
   description: string | null
   projectId: string

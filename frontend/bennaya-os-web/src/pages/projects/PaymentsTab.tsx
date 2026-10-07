@@ -10,13 +10,14 @@ import { paymentsApi } from '../../services/paymentsApi'
 import { ApiError } from '../../services/api'
 import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
-import { formatDate } from '../../utils/format'
+import { useLanguage } from '../../hooks/useLanguage'
 import type { ClientPayment } from '../../types/payment'
 import { PaymentFormModal } from './PaymentFormModal'
 
 export function PaymentsTab({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient()
   const { format } = useCurrency()
+  const { t, formatDate } = useLanguage()
 
   const [editing, setEditing] = useState<ClientPayment | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -37,7 +38,7 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
     },
     onError: (caught: unknown) => {
       setDeleteError(
-        caught instanceof ApiError ? caught.message : 'Could not delete this payment.',
+        caught instanceof ApiError ? caught.message : t('payments.deleteError'),
       )
     },
   })
@@ -52,12 +53,12 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
     setIsFormOpen(true)
   }
 
-  if (isPending) return <Spinner label="Loading payments" />
+  if (isPending) return <Spinner label={t('payments.loading')} />
 
   if (isError) {
     return (
       <ErrorMessage
-        message={error instanceof ApiError ? error.message : 'Could not load payments.'}
+        message={error instanceof ApiError ? error.message : t('payments.loadError')}
       />
     )
   }
@@ -74,26 +75,26 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button onClick={openCreate}>Record payment</Button>
+        <Button onClick={openCreate}>{t('payments.record')}</Button>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <StatCard label="Contract value" value={format(contractValue)} />
-        <StatCard label="Received" value={format(totalReceived)} tone="positive" />
+        <StatCard label={t('money.contractValue')} value={format(contractValue)} />
+        <StatCard label={t('money.received')} value={format(totalReceived)} tone="positive" />
         <StatCard
-          label={isOverpaid ? 'Overpaid by' : 'Outstanding'}
+          label={isOverpaid ? t('money.overpaidBy') : t('money.outstanding')}
           // Show the overpayment as a positive figure under a clear label,
           // rather than a confusing minus sign.
           value={format(Math.abs(outstandingBalance))}
           tone={isOverpaid ? 'positive' : 'warning'}
-          hint={isOverpaid ? 'Client has paid more than the contract' : undefined}
+          hint={isOverpaid ? t('payments.overpaidHint') : undefined}
         />
       </div>
 
       {contractValue > 0 && (
         <div>
           <div className="flex items-center justify-between text-xs text-slate-500">
-            <span>Collected</span>
+            <span>{t('payments.collected')}</span>
             <span className="tabular-nums">{percentReceived.toFixed(0)}%</span>
           </div>
           <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-200">
@@ -107,9 +108,9 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
 
       {items.length === 0 ? (
         <EmptyState
-          title="No payments recorded"
-          description="Record what the client has paid so you always know what is still owed."
-          action={<Button onClick={openCreate}>Record payment</Button>}
+          title={t('payments.emptyTitle')}
+          description={t('payments.emptyDescription')}
+          action={<Button onClick={openCreate}>{t('payments.record')}</Button>}
         />
       ) : (
         <>
@@ -135,10 +136,10 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
 
                 <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
                   <Button variant="secondary" onClick={() => openEdit(payment)} className="flex-1">
-                    Edit
+                    {t('common.edit')}
                   </Button>
                   <Button variant="ghost" onClick={() => setDeleting(payment)} className="flex-1">
-                    Delete
+                    {t('common.delete')}
                   </Button>
                 </div>
               </li>
@@ -147,13 +148,13 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
 
           {/* DESKTOP: table */}
           <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm sm:block">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Date</th>
-                  <th className="px-4 py-3 font-medium">Description</th>
-                  <th className="px-4 py-3 text-right font-medium">Amount</th>
-                  <th className="px-4 py-3 text-right font-medium">Actions</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.date')}</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.description')}</th>
+                  <th className="px-4 py-3 text-end font-medium">{t('fields.amount')}</th>
+                  <th className="px-4 py-3 text-end font-medium">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -163,16 +164,16 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
                       {formatDate(payment.date)}
                     </td>
                     <td className="px-4 py-3 text-slate-600">{payment.description ?? '-'}</td>
-                    <td className="px-4 py-3 text-right font-medium tabular-nums text-emerald-700">
+                    <td className="px-4 py-3 text-end font-medium tabular-nums text-emerald-700">
                       {format(payment.amount)}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">
                         <Button variant="ghost" onClick={() => openEdit(payment)}>
-                          Edit
+                          {t('common.edit')}
                         </Button>
                         <Button variant="ghost" onClick={() => setDeleting(payment)}>
-                          Delete
+                          {t('common.delete')}
                         </Button>
                       </div>
                     </td>
@@ -182,9 +183,9 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
               <tfoot className="border-t border-slate-200 bg-slate-50">
                 <tr>
                   <td colSpan={2} className="px-4 py-3 text-sm font-medium text-slate-600">
-                    Total received
+                    {t('payments.totalReceived')}
                   </td>
-                  <td className="px-4 py-3 text-right text-sm font-semibold tabular-nums text-slate-900">
+                  <td className="px-4 py-3 text-end text-sm font-semibold tabular-nums text-slate-900">
                     {format(totalReceived)}
                   </td>
                   <td />
@@ -204,10 +205,10 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
 
       <ConfirmDialog
         isOpen={deleting !== null}
-        title="Delete payment"
+        title={t('payments.deleteTitle')}
         message={
           deleteError ??
-          `Delete this ${deleting ? format(deleting.amount) : ''} payment? This cannot be undone.`
+          t('payments.deleteConfirm', { amount: deleting ? format(deleting.amount) : '' })
         }
         isLoading={deleteMutation.isPending}
         onConfirm={() => deleting && deleteMutation.mutate(deleting.id)}

@@ -1,3 +1,4 @@
+import { useLanguage } from '../../hooks/useLanguage'
 import type { ProjectStatus } from '../../types/project'
 
 const STYLES: Record<ProjectStatus, string> = {
@@ -8,18 +9,12 @@ const STYLES: Record<ProjectStatus, string> = {
   Cancelled: 'bg-red-50 text-red-700',
 }
 
-const LABELS: Record<ProjectStatus, string> = {
-  Planning: 'Planning',
-  Active: 'Active',
-  OnHold: 'On hold',
-  Completed: 'Completed',
-  Cancelled: 'Cancelled',
-}
-
 export function StatusBadge({ status }: { status: ProjectStatus }) {
+  const { t } = useLanguage()
+
   return (
     <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${STYLES[status]}`}>
-      {LABELS[status]}
+      {t(`projectStatus.${status}`)}
     </span>
   )
 }

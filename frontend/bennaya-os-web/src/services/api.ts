@@ -1,4 +1,6 @@
 import { authStorage } from './authStorage'
+import { languageStorage } from './languageStorage'
+import { translate } from '../i18n'
 import type { ProblemDetails } from '../types/api'
 
 /**
@@ -60,6 +62,10 @@ async function request<TResponse>(
   const session = authStorage.read()
   if (session) headers.Authorization = `Bearer ${session.token}`
 
+  // The API answers in this language, so its error messages match the UI.
+  const language = languageStorage.read()
+  headers['Accept-Language'] = language
+
   let response: Response
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
@@ -70,14 +76,14 @@ async function request<TResponse>(
     })
   } catch (cause) {
     // fetch only rejects on network-level failures (server down, DNS, CORS).
-    throw new ApiError(0, 'Cannot reach the server. Is the API running?', null)
+    throw new ApiError(0, translate(language, 'errors.network'), null)
   }
 
   // 401 means the token is missing, expired or invalid. Handled centrally so
   // every screen logs out consistently instead of showing its own broken state.
   if (response.status === 401) {
     onUnauthorized?.()
-    throw new ApiError(401, 'Your session has expired. Please sign in again.', null)
+    throw new ApiError(401, translate(language, 'errors.sessionExpired'), null)
   }
 
   const isJson = response.headers.get('content-type')?.includes('json')
@@ -87,7 +93,7 @@ async function request<TResponse>(
     const problem = payload as ProblemDetails | null
     throw new ApiError(
       response.status,
-      problem?.title ?? `Request failed (${response.status})`,
+      problem?.title ?? translate(language, 'errors.requestFailed', { status: response.status }),
       problem,
     )
   }

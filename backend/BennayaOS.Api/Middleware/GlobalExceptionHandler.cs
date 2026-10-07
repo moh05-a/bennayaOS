@@ -1,6 +1,8 @@
 using BennayaOS.Api.Exceptions;
+using BennayaOS.Api.Resources;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace BennayaOS.Api.Middleware;
 
@@ -15,11 +17,16 @@ public class GlobalExceptionHandler : IExceptionHandler
 {
     private readonly IHostEnvironment _environment;
     private readonly ILogger<GlobalExceptionHandler> _logger;
+    private readonly IStringLocalizer<SharedResource> _localizer;
 
-    public GlobalExceptionHandler(IHostEnvironment environment, ILogger<GlobalExceptionHandler> logger)
+    public GlobalExceptionHandler(
+        IHostEnvironment environment,
+        ILogger<GlobalExceptionHandler> logger,
+        IStringLocalizer<SharedResource> localizer)
     {
         _environment = environment;
         _logger = logger;
+        _localizer = localizer;
     }
 
     public async ValueTask<bool> TryHandleAsync(
@@ -32,13 +39,14 @@ public class GlobalExceptionHandler : IExceptionHandler
         if (exception is AppException appException)
         {
             // Errors we raised on purpose. Safe to show to the caller.
+            // Logged in English; returned in the caller's language.
             _logger.LogInformation("Handled {Type}: {Message}",
                 exception.GetType().Name, exception.Message);
 
             problem = new ProblemDetails
             {
                 Status = appException.StatusCode,
-                Title = appException.Message,
+                Title = _localizer[appException.MessageTemplate, appException.MessageArguments],
             };
         }
         else if (exception is UnauthorizedAccessException)
@@ -46,7 +54,7 @@ public class GlobalExceptionHandler : IExceptionHandler
             problem = new ProblemDetails
             {
                 Status = StatusCodes.Status401Unauthorized,
-                Title = "Authentication required.",
+                Title = _localizer["Authentication required."],
             };
         }
         else
@@ -59,7 +67,7 @@ public class GlobalExceptionHandler : IExceptionHandler
             problem = new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,
-                Title = "An unexpected error occurred.",
+                Title = _localizer["An unexpected error occurred."],
                 // Detail only in development, never in production.
                 Detail = _environment.IsDevelopment() ? exception.ToString() : null,
             };

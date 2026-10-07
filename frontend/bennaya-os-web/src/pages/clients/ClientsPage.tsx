@@ -8,11 +8,13 @@ import { PageHeader } from '../../components/ui/PageHeader'
 import { Spinner } from '../../components/ui/Spinner'
 import { clientsApi } from '../../services/clientsApi'
 import { ApiError } from '../../services/api'
+import { useLanguage } from '../../hooks/useLanguage'
 import type { Client } from '../../types/client'
 import { ClientFormModal } from './ClientFormModal'
 
 export function ClientsPage() {
   const queryClient = useQueryClient()
+  const { t } = useLanguage()
 
   const [editing, setEditing] = useState<Client | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -37,7 +39,7 @@ export function ClientsPage() {
       // The API returns 409 with a readable reason when the client still has
       // projects. Show that message rather than a generic failure.
       setDeleteError(
-        caught instanceof ApiError ? caught.message : 'Could not delete this client.',
+        caught instanceof ApiError ? caught.message : t('clients.deleteError'),
       )
     },
   })
@@ -55,24 +57,24 @@ export function ClientsPage() {
   return (
     <div className="mx-auto max-w-5xl">
       <PageHeader
-        title="Clients"
-        description="The people and companies you build for."
-        action={<Button onClick={openCreate}>Add client</Button>}
+        title={t('clients.title')}
+        description={t('clients.description')}
+        action={<Button onClick={openCreate}>{t('clients.add')}</Button>}
       />
 
-      {isPending && <Spinner label="Loading clients" />}
+      {isPending && <Spinner label={t('clients.loading')} />}
 
       {isError && (
         <ErrorMessage
-          message={error instanceof ApiError ? error.message : 'Could not load clients.'}
+          message={error instanceof ApiError ? error.message : t('clients.loadError')}
         />
       )}
 
       {clients && clients.length === 0 && (
         <EmptyState
-          title="No clients yet"
-          description="Add your first client to start creating projects for them."
-          action={<Button onClick={openCreate}>Add client</Button>}
+          title={t('clients.emptyTitle')}
+          description={t('clients.emptyDescription')}
+          action={<Button onClick={openCreate}>{t('clients.add')}</Button>}
         />
       )}
 
@@ -94,7 +96,7 @@ export function ClientsPage() {
                         href={`tel:${client.phone}`}
                         className="mt-0.5 block text-sm text-slate-600 underline underline-offset-2"
                       >
-                        {client.phone}
+                        <span dir="ltr">{client.phone}</span>
                       </a>
                     )}
                     {client.email && (
@@ -102,16 +104,16 @@ export function ClientsPage() {
                     )}
                   </div>
                   <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                    {client.projectCount} project{client.projectCount === 1 ? '' : 's'}
+                    {t('clients.projectCount', { count: client.projectCount })}
                   </span>
                 </div>
 
                 <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
                   <Button variant="secondary" onClick={() => openEdit(client)} className="flex-1">
-                    Edit
+                    {t('common.edit')}
                   </Button>
                   <Button variant="ghost" onClick={() => setDeleting(client)} className="flex-1">
-                    Delete
+                    {t('common.delete')}
                   </Button>
                 </div>
               </li>
@@ -120,30 +122,32 @@ export function ClientsPage() {
 
           {/* DESKTOP: table */}
           <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm sm:block">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Name</th>
-                  <th className="px-4 py-3 font-medium">Phone</th>
-                  <th className="px-4 py-3 font-medium">Email</th>
-                  <th className="px-4 py-3 font-medium">Projects</th>
-                  <th className="px-4 py-3 text-right font-medium">Actions</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.name')}</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.phone')}</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.email')}</th>
+                  <th className="px-4 py-3 font-medium">{t('clients.projectsColumn')}</th>
+                  <th className="px-4 py-3 text-end font-medium">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {clients.map((client) => (
                   <tr key={client.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-medium text-slate-900">{client.name}</td>
-                    <td className="px-4 py-3 text-slate-600">{client.phone ?? '-'}</td>
+                    <td className="px-4 py-3 text-slate-600">
+                      <span dir="ltr">{client.phone ?? '-'}</span>
+                    </td>
                     <td className="px-4 py-3 text-slate-600">{client.email ?? '-'}</td>
                     <td className="px-4 py-3 text-slate-600">{client.projectCount}</td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">
                         <Button variant="ghost" onClick={() => openEdit(client)}>
-                          Edit
+                          {t('common.edit')}
                         </Button>
                         <Button variant="ghost" onClick={() => setDeleting(client)}>
-                          Delete
+                          {t('common.delete')}
                         </Button>
                       </div>
                     </td>
@@ -163,8 +167,8 @@ export function ClientsPage() {
 
       <ConfirmDialog
         isOpen={deleting !== null}
-        title="Delete client"
-        message={deleteError ?? `Delete "${deleting?.name}"? This cannot be undone.`}
+        title={t('clients.deleteTitle')}
+        message={deleteError ?? t('common.confirmDelete', { name: deleting?.name ?? '' })}
         isLoading={deleteMutation.isPending}
         onConfirm={() => deleting && deleteMutation.mutate(deleting.id)}
         onCancel={() => {

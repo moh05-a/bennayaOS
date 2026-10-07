@@ -12,7 +12,7 @@ import { Textarea } from '../../components/ui/Textarea'
 import { tasksApi } from '../../services/tasksApi'
 import { ApiError } from '../../services/api'
 import { invalidateProjectFinancials } from '../../utils/invalidate'
-import { formatDate } from '../../utils/format'
+import { useLanguage } from '../../hooks/useLanguage'
 import { TASK_STATUSES } from '../../types/task'
 import type { ProjectTask, ProjectTaskStatus } from '../../types/task'
 
@@ -20,12 +20,6 @@ const STATUS_STYLES: Record<ProjectTaskStatus, string> = {
   Todo: 'bg-slate-100 text-slate-700',
   InProgress: 'bg-blue-50 text-blue-700',
   Completed: 'bg-emerald-50 text-emerald-700',
-}
-
-const STATUS_LABELS: Record<ProjectTaskStatus, string> = {
-  Todo: 'To do',
-  InProgress: 'In progress',
-  Completed: 'Completed',
 }
 
 /** Tapping the status cycles forward - the fastest path for the common case. */
@@ -44,6 +38,7 @@ const EMPTY_FORM = {
 
 export function TasksTab({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient()
+  const { t, formatDate } = useLanguage()
 
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editing, setEditing] = useState<ProjectTask | null>(null)
@@ -78,7 +73,7 @@ export function TasksTab({ projectId }: { projectId: string }) {
         if (Object.keys(errors).length > 0) setFieldErrors(errors)
         else setFormError(caught.message)
       } else {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('errors.generic'))
       }
     },
   })
@@ -129,12 +124,12 @@ export function TasksTab({ projectId }: { projectId: string }) {
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setForm((current) => ({ ...current, [field]: event.target.value }))
 
-  if (isPending) return <Spinner label="Loading tasks" />
+  if (isPending) return <Spinner label={t('tasks.loading')} />
 
   if (isError) {
     return (
       <ErrorMessage
-        message={error instanceof ApiError ? error.message : 'Could not load tasks.'}
+        message={error instanceof ApiError ? error.message : t('tasks.loadError')}
       />
     )
   }
@@ -153,29 +148,29 @@ export function TasksTab({ projectId }: { projectId: string }) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-1.5">
           <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-            To do {todoCount}
+            {t('tasks.todoCount', { count: todoCount })}
           </span>
           <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
-            In progress {inProgressCount}
+            {t('tasks.inProgressCount', { count: inProgressCount })}
           </span>
           <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
-            Done {completedCount}
+            {t('tasks.doneCount', { count: completedCount })}
           </span>
           {overdueCount > 0 && (
             <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700">
-              Overdue {overdueCount}
+              {t('tasks.overdueCount', { count: overdueCount })}
             </span>
           )}
         </div>
 
-        <Button onClick={openCreate}>Add task</Button>
+        <Button onClick={openCreate}>{t('tasks.add')}</Button>
       </div>
 
       {items.length === 0 ? (
         <EmptyState
-          title="No tasks yet"
-          description="Track what still needs doing on this project."
-          action={<Button onClick={openCreate}>Add task</Button>}
+          title={t('tasks.emptyTitle')}
+          description={t('tasks.emptyDescription')}
+          action={<Button onClick={openCreate}>{t('tasks.add')}</Button>}
         />
       ) : (
         <>
@@ -209,11 +204,12 @@ export function TasksTab({ projectId }: { projectId: string }) {
                       <p className="mt-1 text-xs">
                         {task.dueDate ? (
                           <span className={overdue ? 'font-medium text-red-700' : 'text-slate-500'}>
-                            {overdue ? 'Overdue · ' : 'Due '}
-                            {formatDate(task.dueDate)}
+                            {overdue
+                              ? t('tasks.overdueOn', { date: formatDate(task.dueDate) })
+                              : t('tasks.dueOn', { date: formatDate(task.dueDate) })}
                           </span>
                         ) : (
-                          <span className="text-slate-400">No due date</span>
+                          <span className="text-slate-400">{t('tasks.noDueDate')}</span>
                         )}
                       </p>
                     </div>
@@ -225,21 +221,21 @@ export function TasksTab({ projectId }: { projectId: string }) {
                         statusMutation.mutate({ task, status: NEXT_STATUS[task.status] })
                       }
                       disabled={statusMutation.isPending}
-                      title="Tap to change status"
+                      title={t('tasks.tapToChangeStatus')}
                       className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition hover:opacity-80 disabled:opacity-50 ${
                         STATUS_STYLES[task.status]
                       }`}
                     >
-                      {STATUS_LABELS[task.status]}
+                      {t(`taskStatus.${task.status}`)}
                     </button>
                   </div>
 
                   <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
                     <Button variant="secondary" onClick={() => openEdit(task)}>
-                      Edit
+                      {t('common.edit')}
                     </Button>
                     <Button variant="ghost" onClick={() => setDeleting(task)}>
-                      Delete
+                      {t('common.delete')}
                     </Button>
                   </div>
                 </li>
@@ -253,8 +249,9 @@ export function TasksTab({ projectId }: { projectId: string }) {
               onClick={() => setShowCompleted((current) => !current)}
               className="text-sm text-slate-500 underline underline-offset-4 hover:text-slate-900"
             >
-              {showCompleted ? 'Hide' : 'Show'} {completedCount} completed task
-              {completedCount === 1 ? '' : 's'}
+              {showCompleted
+                ? t('tasks.hideCompleted', { count: completedCount })
+                : t('tasks.showCompleted', { count: completedCount })}
             </button>
           )}
         </>
@@ -262,7 +259,7 @@ export function TasksTab({ projectId }: { projectId: string }) {
 
       <Modal
         isOpen={isFormOpen}
-        title={editing ? 'Edit task' : 'Add task'}
+        title={editing ? t('tasks.edit') : t('tasks.add')}
         onClose={() => setIsFormOpen(false)}
       >
         <form
@@ -277,17 +274,17 @@ export function TasksTab({ projectId }: { projectId: string }) {
           {formError && <ErrorMessage message={formError} />}
 
           <Input
-            label="Title"
+            label={t('tasks.title')}
             required
             autoFocus
             value={form.title}
             onChange={update('title')}
             error={fieldErrors.title}
-            placeholder="Order bathroom tiles"
+            placeholder={t('tasks.titlePlaceholder')}
           />
 
           <Input
-            label="Due date (optional)"
+            label={t('tasks.dueDateOptional')}
             type="date"
             value={form.dueDate}
             onChange={update('dueDate')}
@@ -295,19 +292,19 @@ export function TasksTab({ projectId }: { projectId: string }) {
           />
 
           <Select
-            label="Status"
+            label={t('fields.status')}
             value={form.status}
             onChange={update('status')}
             error={fieldErrors.status}
-            options={TASK_STATUSES.map((s) => ({ value: s.value, label: s.label }))}
+            options={TASK_STATUSES.map((s) => ({ value: s, label: t(`taskStatus.${s}`) }))}
           />
 
           <Textarea
-            label="Notes"
+            label={t('tasks.notes')}
             value={form.description}
             onChange={update('description')}
             error={fieldErrors.description}
-            placeholder="Any detail worth remembering"
+            placeholder={t('tasks.notesPlaceholder')}
           />
 
           <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
@@ -317,10 +314,10 @@ export function TasksTab({ projectId }: { projectId: string }) {
               onClick={() => setIsFormOpen(false)}
               disabled={saveMutation.isPending}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" isLoading={saveMutation.isPending}>
-              {editing ? 'Save changes' : 'Add task'}
+              {editing ? t('common.saveChanges') : t('tasks.add')}
             </Button>
           </div>
         </form>
@@ -328,8 +325,8 @@ export function TasksTab({ projectId }: { projectId: string }) {
 
       <ConfirmDialog
         isOpen={deleting !== null}
-        title="Delete task"
-        message={`Delete "${deleting?.title}"? This cannot be undone.`}
+        title={t('tasks.deleteTitle')}
+        message={t('common.confirmDelete', { name: deleting?.title ?? '' })}
         isLoading={deleteMutation.isPending}
         onConfirm={() => deleting && deleteMutation.mutate(deleting.id)}
         onCancel={() => setDeleting(null)}

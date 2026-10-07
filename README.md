@@ -84,6 +84,23 @@ cd frontend/bennaya-os-web
 npm run dev
 ```
 
+## Languages (English / Arabic)
+
+The language switcher is in the sidebar and on the sign-in pages. Arabic flips
+the whole layout to right-to-left. The choice is remembered per browser, and
+the frontend sends it to the API as `Accept-Language`, so server error messages
+come back in the same language.
+
+Adding user-facing text:
+
+- **Frontend:** add the key to `src/i18n/en.ts` and `src/i18n/ar.ts` (the build
+  fails if Arabic is missing a key), then use `t('section.key')` from
+  `useLanguage()`.
+- **Backend:** write the message in English in code as usual, then add an entry
+  to `Resources/SharedResource.ar.resx` whose `name` is that exact English text.
+- **Layout:** use logical Tailwind classes (`ms-`/`me-`, `ps-`/`pe-`,
+  `start-`/`end-`, `text-start`/`text-end`) instead of left/right ones.
+
 ## Security notes
 
 - Connection strings and signing keys live in User Secrets (dev) or environment

@@ -9,10 +9,12 @@ import { StatusBadge } from '../../components/ui/StatusBadge'
 import { projectsApi } from '../../services/projectsApi'
 import { ApiError } from '../../services/api'
 import { useCurrency } from '../../hooks/useCurrency'
+import { useLanguage } from '../../hooks/useLanguage'
 
 export function ProjectsPage() {
   const navigate = useNavigate()
   const { format } = useCurrency()
+  const { t } = useLanguage()
 
   const { data: projects, isPending, isError, error } = useQuery({
     queryKey: ['projects'],
@@ -22,24 +24,24 @@ export function ProjectsPage() {
   return (
     <div className="mx-auto max-w-6xl">
       <PageHeader
-        title="Projects"
-        description="Every job you are running."
-        action={<Button onClick={() => navigate('/projects/new')}>New project</Button>}
+        title={t('projects.title')}
+        description={t('projects.description')}
+        action={<Button onClick={() => navigate('/projects/new')}>{t('projects.new')}</Button>}
       />
 
-      {isPending && <Spinner label="Loading projects" />}
+      {isPending && <Spinner label={t('projects.loading')} />}
 
       {isError && (
         <ErrorMessage
-          message={error instanceof ApiError ? error.message : 'Could not load projects.'}
+          message={error instanceof ApiError ? error.message : t('projects.loadError')}
         />
       )}
 
       {projects && projects.length === 0 && (
         <EmptyState
-          title="No projects yet"
-          description="Create your first project to start tracking its contract value, expenses and payments."
-          action={<Button onClick={() => navigate('/projects/new')}>New project</Button>}
+          title={t('projects.emptyTitle')}
+          description={t('projects.emptyDescription')}
+          action={<Button onClick={() => navigate('/projects/new')}>{t('projects.new')}</Button>}
         />
       )}
 
@@ -66,13 +68,13 @@ export function ProjectsPage() {
 
                   <div className="mt-2 flex gap-4 text-xs">
                     <span className="text-slate-500">
-                      Received{' '}
+                      {t('money.received')}{' '}
                       <span className="font-medium tabular-nums text-emerald-700">
                         {format(project.totalReceived)}
                       </span>
                     </span>
                     <span className="text-slate-500">
-                      Spent{' '}
+                      {t('money.spent')}{' '}
                       <span
                         className={`font-medium tabular-nums ${
                           project.totalExpenses > project.contractValue
@@ -95,16 +97,16 @@ export function ProjectsPage() {
 
           {/* DESKTOP: table */}
           <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm sm:block">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Project</th>
-                  <th className="px-4 py-3 font-medium">Client</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 text-right font-medium">Contract value</th>
-                  <th className="px-4 py-3 text-right font-medium">Received</th>
-                  <th className="px-4 py-3 text-right font-medium">Spent</th>
-                  <th className="px-4 py-3 text-right font-medium">Outstanding</th>
+                  <th className="px-4 py-3 font-medium">{t('projects.projectColumn')}</th>
+                  <th className="px-4 py-3 font-medium">{t('projects.clientColumn')}</th>
+                  <th className="px-4 py-3 font-medium">{t('fields.status')}</th>
+                  <th className="px-4 py-3 text-end font-medium">{t('money.contractValue')}</th>
+                  <th className="px-4 py-3 text-end font-medium">{t('money.received')}</th>
+                  <th className="px-4 py-3 text-end font-medium">{t('money.spent')}</th>
+                  <th className="px-4 py-3 text-end font-medium">{t('money.outstanding')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -132,14 +134,14 @@ export function ProjectsPage() {
                     <td className="px-4 py-3">
                       <StatusBadge status={project.status} />
                     </td>
-                    <td className="px-4 py-3 text-right font-medium tabular-nums text-slate-900">
+                    <td className="px-4 py-3 text-end font-medium tabular-nums text-slate-900">
                       {format(project.contractValue)}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-emerald-700">
+                    <td className="px-4 py-3 text-end tabular-nums text-emerald-700">
                       {format(project.totalReceived)}
                     </td>
                     <td
-                      className={`px-4 py-3 text-right tabular-nums ${
+                      className={`px-4 py-3 text-end tabular-nums ${
                         project.totalExpenses > project.contractValue
                           ? 'font-medium text-red-700'
                           : 'text-slate-600'
@@ -147,7 +149,7 @@ export function ProjectsPage() {
                     >
                       {format(project.totalExpenses)}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-slate-600">
+                    <td className="px-4 py-3 text-end tabular-nums text-slate-600">
                       {format(project.outstandingBalance)}
                     </td>
                   </tr>

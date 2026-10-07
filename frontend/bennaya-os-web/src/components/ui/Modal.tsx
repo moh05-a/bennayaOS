@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
+import { useLanguage } from '../../hooks/useLanguage'
 
 interface ModalProps {
   isOpen: boolean
@@ -9,6 +10,8 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, title, onClose, children }: ModalProps) {
+  const { t } = useLanguage()
+
   // Escape closes the dialog - expected behaviour for anyone using a keyboard.
   useEffect(() => {
     if (!isOpen) return
@@ -49,7 +52,7 @@ export function Modal({ isOpen, title, onClose, children }: ModalProps) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t('common.close')}
             className="-m-1 rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
             <svg viewBox="0 0 20 20" fill="currentColor" className="size-5">

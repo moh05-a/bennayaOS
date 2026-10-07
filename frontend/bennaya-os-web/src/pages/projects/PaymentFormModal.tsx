@@ -8,6 +8,7 @@ import { paymentsApi } from '../../services/paymentsApi'
 import { ApiError } from '../../services/api'
 import { invalidateProjectFinancials } from '../../utils/invalidate'
 import { useCurrency } from '../../hooks/useCurrency'
+import { useLanguage } from '../../hooks/useLanguage'
 import { todayIsoDate } from '../../utils/format'
 import type { ClientPayment } from '../../types/payment'
 
@@ -21,18 +22,14 @@ interface PaymentFormModalProps {
 /**
  * Common payment labels. Tapping one fills the description, because typing
  * "Foundation payment" on a phone at a building site is friction we can remove.
+ * These are dictionary keys, so the filled-in text is in the user's language.
  */
-const QUICK_LABELS = [
-  'Deposit',
-  'Foundation payment',
-  'Structure payment',
-  'Finishing payment',
-  'Final payment',
-]
+const QUICK_LABELS = ['deposit', 'foundation', 'structure', 'finishing', 'final'] as const
 
 export function PaymentFormModal({ isOpen, projectId, payment, onClose }: PaymentFormModalProps) {
   const queryClient = useQueryClient()
   const { currencyCode } = useCurrency()
+  const { t } = useLanguage()
 
   const [form, setForm] = useState({
     amount: '',
@@ -78,7 +75,7 @@ export function PaymentFormModal({ isOpen, projectId, payment, onClose }: Paymen
         if (Object.keys(errors).length > 0) setFieldErrors(errors)
         else setFormError(error.message)
       } else {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('errors.generic'))
       }
     },
   })
@@ -97,14 +94,14 @@ export function PaymentFormModal({ isOpen, projectId, payment, onClose }: Paymen
   return (
     <Modal
       isOpen={isOpen}
-      title={payment ? 'Edit payment' : 'Record payment'}
+      title={payment ? t('payments.edit') : t('payments.record')}
       onClose={onClose}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {formError && <ErrorMessage message={formError} />}
 
         <Input
-          label={`Amount received (${currencyCode})`}
+          label={t('payments.amountReceived', { currency: currencyCode })}
           type="number"
           step="0.001"
           min="0"
@@ -118,7 +115,7 @@ export function PaymentFormModal({ isOpen, projectId, payment, onClose }: Paymen
         />
 
         <Input
-          label="Date received"
+          label={t('payments.dateReceived')}
           type="date"
           required
           value={form.date}
@@ -128,33 +125,36 @@ export function PaymentFormModal({ isOpen, projectId, payment, onClose }: Paymen
 
         <div className="space-y-2">
           <Input
-            label="Description"
+            label={t('fields.description')}
             value={form.description}
             onChange={update('description')}
             error={fieldErrors.description}
-            placeholder="Deposit"
+            placeholder={t('paymentLabels.deposit')}
           />
 
           <div className="flex flex-wrap gap-1.5">
-            {QUICK_LABELS.map((label) => (
-              <button
-                key={label}
-                type="button"
-                onClick={() => setForm((current) => ({ ...current, description: label }))}
-                className="rounded-full border border-slate-300 px-2.5 py-1 text-xs text-slate-600 hover:bg-slate-50"
-              >
-                {label}
-              </button>
-            ))}
+            {QUICK_LABELS.map((key) => {
+              const label = t(`paymentLabels.${key}`)
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setForm((current) => ({ ...current, description: label }))}
+                  className="rounded-full border border-slate-300 px-2.5 py-1 text-xs text-slate-600 hover:bg-slate-50"
+                >
+                  {label}
+                </button>
+              )
+            })}
           </div>
         </div>
 
         <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
           <Button type="button" variant="secondary" onClick={onClose} disabled={mutation.isPending}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" isLoading={mutation.isPending}>
-            {payment ? 'Save changes' : 'Record payment'}
+            {payment ? t('common.saveChanges') : t('payments.record')}
           </Button>
         </div>
       </form>

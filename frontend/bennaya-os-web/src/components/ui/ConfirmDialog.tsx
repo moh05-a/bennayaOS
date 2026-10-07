@@ -1,5 +1,6 @@
 import { Button } from './Button'
 import { Modal } from './Modal'
+import { useLanguage } from '../../hooks/useLanguage'
 
 interface ConfirmDialogProps {
   isOpen: boolean
@@ -16,21 +17,23 @@ export function ConfirmDialog({
   isOpen,
   title,
   message,
-  confirmLabel = 'Delete',
+  confirmLabel,
   isLoading = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const { t } = useLanguage()
+
   return (
     <Modal isOpen={isOpen} title={title} onClose={onCancel}>
       <p className="text-sm text-slate-600">{message}</p>
 
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button variant="secondary" onClick={onCancel} disabled={isLoading}>
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button variant="danger" onClick={onConfirm} isLoading={isLoading}>
-          {confirmLabel}
+          {confirmLabel ?? t('common.delete')}
         </Button>
       </div>
     </Modal>
