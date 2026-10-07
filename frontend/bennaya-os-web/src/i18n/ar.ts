@@ -32,6 +32,8 @@ export const ar: Dictionary = {
     description: 'الوصف',
     supplier: 'المورّد',
     status: 'الحالة',
+    project: 'المشروع',
+    selectProject: 'اختر مشروعاً',
   },
 
   errors: {
@@ -46,6 +48,7 @@ export const ar: Dictionary = {
   },
 
   nav: {
+    workspace: 'مساحة عمل المقاول',
     dashboard: 'لوحة التحكم',
     projects: 'المشاريع',
     clients: 'العملاء',
@@ -147,6 +150,7 @@ export const ar: Dictionary = {
   },
 
   dashboard: {
+    collectedOfContract: 'تم تحصيل {percent} من قيمة العقود',
     loading: 'جارٍ تحميل لوحة التحكم',
     loadError: 'تعذّر تحميل لوحة التحكم.',
     welcome: 'أهلاً، {name}',
@@ -183,6 +187,10 @@ export const ar: Dictionary = {
     overdueOn: 'متأخرة · {date}',
     noDueDate: 'بدون تاريخ استحقاق',
     footnote: 'المجاميع المالية والمهام لا تشمل المشاريع الملغاة.',
+    quickExpense: '+ مصروف',
+    quickPayment: '+ دفعة',
+    markDone: 'تحديد "{title}" كمنجزة',
+    taskUpdateError: 'تعذّر تحديث المهمة. يرجى المحاولة مرة أخرى.',
   },
 
   clients: {
@@ -234,6 +242,31 @@ export const ar: Dictionary = {
   },
 
   projects: {
+    dayOf: 'اليوم {day} من {total}',
+    daysLeft: {
+      zero: 'لم يتبقَّ أي يوم',
+      one: 'متبقٍ يوم واحد',
+      two: 'متبقٍ يومان',
+      few: 'متبقٍ {count} أيام',
+      many: 'متبقٍ {count} يوماً',
+      other: 'متبقٍ {count} يوم',
+    },
+    startsIn: {
+      zero: 'يبدأ اليوم',
+      one: 'يبدأ بعد يوم واحد',
+      two: 'يبدأ بعد يومين',
+      few: 'يبدأ بعد {count} أيام',
+      many: 'يبدأ بعد {count} يوماً',
+      other: 'يبدأ بعد {count} يوم',
+    },
+    daysPastEnd: {
+      zero: 'في تاريخ التسليم المتوقع',
+      one: 'تجاوز التسليم المتوقع بيوم واحد',
+      two: 'تجاوز التسليم المتوقع بيومين',
+      few: 'تجاوز التسليم المتوقع بـ{count} أيام',
+      many: 'تجاوز التسليم المتوقع بـ{count} يوماً',
+      other: 'تجاوز التسليم المتوقع بـ{count} يوم',
+    },
     title: 'المشاريع',
     description: 'جميع الأعمال التي تنفذها.',
     new: 'مشروع جديد',
@@ -281,6 +314,7 @@ export const ar: Dictionary = {
   },
 
   overview: {
+    scheduleElapsed: 'المنقضي من مدة المشروع',
     inclSubcontractors: 'منها {amount} للمقاولين الفرعيين',
     netCashHint:
       'المقبوض مطروحاً منه المصروف. هذا نقد وليس ربحاً — فهو لا يشمل الأعمال المنجزة التي لم تُفوتَر بعد، ولا التكاليف الملتزم بها التي لم تُدفع بعد.',

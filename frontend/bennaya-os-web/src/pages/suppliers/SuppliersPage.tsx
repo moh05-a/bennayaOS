@@ -11,6 +11,7 @@ import { ApiError } from '../../services/api'
 import { useCurrency } from '../../hooks/useCurrency'
 import { useLanguage } from '../../hooks/useLanguage'
 import type { Supplier } from '../../types/supplier'
+import { initials } from '../../utils/initials'
 import { SupplierFormModal } from './SupplierFormModal'
 
 export function SuppliersPage() {
@@ -66,7 +67,7 @@ export function SuppliersPage() {
       : t('common.confirmDelete', { name: supplier.name })
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-6xl">
       <PageHeader
         title={t('suppliers.title')}
         description={t('suppliers.description')}
@@ -127,7 +128,7 @@ export function SuppliersPage() {
                   <Button variant="secondary" onClick={() => openEdit(supplier)} className="flex-1">
                     {t('common.edit')}
                   </Button>
-                  <Button variant="ghost" onClick={() => setDeleting(supplier)} className="flex-1">
+                  <Button variant="dangerGhost" onClick={() => setDeleting(supplier)} className="flex-1">
                     {t('common.delete')}
                   </Button>
                 </div>
@@ -138,36 +139,46 @@ export function SuppliersPage() {
           {/* DESKTOP: table */}
           <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm sm:block">
             <table className="w-full text-start text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+              <thead className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">{t('fields.name')}</th>
-                  <th className="px-4 py-3 font-medium">{t('fields.phone')}</th>
-                  <th className="px-4 py-3 font-medium">{t('fields.email')}</th>
-                  <th className="px-4 py-3 text-end font-medium">{t('suppliers.expensesColumn')}</th>
-                  <th className="px-4 py-3 text-end font-medium">{t('money.totalSpent')}</th>
-                  <th className="px-4 py-3 text-end font-medium">{t('common.actions')}</th>
+                  <th className="px-5 py-3.5 font-medium">{t('fields.name')}</th>
+                  <th className="px-5 py-3.5 font-medium">{t('fields.phone')}</th>
+                  <th className="px-5 py-3.5 font-medium">{t('fields.email')}</th>
+                  <th className="px-5 py-3.5 text-end font-medium">{t('suppliers.expensesColumn')}</th>
+                  <th className="px-5 py-3.5 text-end font-medium">{t('money.totalSpent')}</th>
+                  <th className="px-5 py-3.5 text-end font-medium">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {suppliers.map((supplier) => (
                   <tr key={supplier.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3 font-medium text-slate-900">{supplier.name}</td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-2.5">
+                        <div
+                          aria-hidden
+                          className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-xs font-semibold text-blue-700"
+                        >
+                          {initials(supplier.name)}
+                        </div>
+                        <span className="font-semibold text-slate-900">{supplier.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3.5 text-slate-600">
                       <span dir="ltr">{supplier.phone ?? '-'}</span>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{supplier.email ?? '-'}</td>
-                    <td className="px-4 py-3 text-end tabular-nums text-slate-600">
+                    <td className="px-5 py-3.5 text-slate-600">{supplier.email ?? '-'}</td>
+                    <td className="px-5 py-3.5 text-end tabular-nums text-slate-600">
                       {supplier.expenseCount}
                     </td>
-                    <td className="px-4 py-3 text-end font-medium tabular-nums text-slate-900">
+                    <td className="px-5 py-3.5 text-end font-medium tabular-nums text-slate-900">
                       {format(supplier.totalSpent)}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-3.5">
                       <div className="flex justify-end gap-1">
                         <Button variant="ghost" onClick={() => openEdit(supplier)}>
                           {t('common.edit')}
                         </Button>
-                        <Button variant="ghost" onClick={() => setDeleting(supplier)}>
+                        <Button variant="dangerGhost" onClick={() => setDeleting(supplier)}>
                           {t('common.delete')}
                         </Button>
                       </div>

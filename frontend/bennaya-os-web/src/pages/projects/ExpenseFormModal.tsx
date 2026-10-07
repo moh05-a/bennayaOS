@@ -14,10 +14,12 @@ import { useLanguage } from '../../hooks/useLanguage'
 import { todayIsoDate } from '../../utils/format'
 import { EXPENSE_CATEGORIES } from '../../types/expense'
 import type { Expense, ExpenseCategory } from '../../types/expense'
+import { ProjectSelect } from './ProjectSelect'
 
 interface ExpenseFormModalProps {
   isOpen: boolean
-  projectId: string
+  /** null = the user picks the project in the form (dashboard quick add). */
+  projectId: string | null
   /** null = adding a new expense, otherwise editing this one. */
   expense: Expense | null
   onClose: () => void
@@ -37,8 +39,11 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
     description: '',
     supplierId: '',
   })
+  const [chosenProjectId, setChosenProjectId] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
+
+  const targetProjectId = projectId ?? chosenProjectId
 
   // Shares the ['suppliers'] cache with the Suppliers page, so this dropdown
   // is usually populated instantly with no extra request.
@@ -66,6 +71,7 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
             supplierId: '',
           },
     )
+    setChosenProjectId('')
     setFieldErrors({})
     setFormError(null)
   }, [isOpen, expense])
@@ -82,10 +88,10 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
       }
       return expense
         ? expensesApi.update(expense.id, payload)
-        : expensesApi.create(projectId, payload)
+        : expensesApi.create(targetProjectId, payload)
     },
     onSuccess: () => {
-      invalidateProjectFinancials(queryClient, projectId)
+      invalidateProjectFinancials(queryClient, targetProjectId)
       onClose()
     },
     onError: (error: unknown) => {
@@ -116,6 +122,10 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
       <form onSubmit={handleSubmit} className="space-y-4">
         {formError && <ErrorMessage message={formError} />}
 
+        {projectId === null && (
+          <ProjectSelect value={chosenProjectId} onChange={setChosenProjectId} />
+        )}
+
         <Input
           label={t('expenses.amountWithCurrency', { currency: currencyCode })}
           type="number"
@@ -123,7 +133,7 @@ export function ExpenseFormModal({ isOpen, projectId, expense, onClose }: Expens
           min="0"
           inputMode="decimal"
           required
-          autoFocus
+          autoFocus={projectId !== null}
           value={form.amount}
           onChange={update('amount')}
           error={fieldErrors.amount}

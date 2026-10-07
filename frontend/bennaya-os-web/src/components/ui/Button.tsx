@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost'
+type Variant = 'primary' | 'secondary' | 'danger' | 'dangerGhost' | 'ghost'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant
@@ -12,6 +12,8 @@ const VARIANT_CLASSES: Record<Variant, string> = {
   primary: 'bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-slate-900',
   secondary: 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50',
   danger: 'bg-red-600 text-white hover:bg-red-700 focus-visible:outline-red-600',
+  // A destructive action that should not shout until it is asked for.
+  dangerGhost: 'text-red-700 hover:bg-red-50',
   ghost: 'text-slate-600 hover:bg-slate-100',
 }
 

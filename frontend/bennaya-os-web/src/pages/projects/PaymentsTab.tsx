@@ -97,7 +97,7 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
             <span>{t('payments.collected')}</span>
             <span className="tabular-nums">{percentReceived.toFixed(0)}%</span>
           </div>
-          <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-200">
+          <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100">
             <div
               className="h-full rounded-full bg-emerald-500 transition-all"
               style={{ width: `${percentReceived}%` }}
@@ -138,7 +138,7 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
                   <Button variant="secondary" onClick={() => openEdit(payment)} className="flex-1">
                     {t('common.edit')}
                   </Button>
-                  <Button variant="ghost" onClick={() => setDeleting(payment)} className="flex-1">
+                  <Button variant="dangerGhost" onClick={() => setDeleting(payment)} className="flex-1">
                     {t('common.delete')}
                   </Button>
                 </div>
@@ -149,12 +149,12 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
           {/* DESKTOP: table */}
           <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm sm:block">
             <table className="w-full text-start text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+              <thead className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">{t('fields.date')}</th>
-                  <th className="px-4 py-3 font-medium">{t('fields.description')}</th>
-                  <th className="px-4 py-3 text-end font-medium">{t('fields.amount')}</th>
-                  <th className="px-4 py-3 text-end font-medium">{t('common.actions')}</th>
+                  <th className="px-5 py-3.5 font-medium">{t('fields.date')}</th>
+                  <th className="px-5 py-3.5 font-medium">{t('fields.description')}</th>
+                  <th className="px-5 py-3.5 text-end font-medium">{t('fields.amount')}</th>
+                  <th className="px-5 py-3.5 text-end font-medium">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -163,16 +163,16 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
                     <td className="whitespace-nowrap px-4 py-3 text-slate-600">
                       {formatDate(payment.date)}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{payment.description ?? '-'}</td>
-                    <td className="px-4 py-3 text-end font-medium tabular-nums text-emerald-700">
+                    <td className="px-5 py-3.5 text-slate-600">{payment.description ?? '-'}</td>
+                    <td className="px-5 py-3.5 text-end font-medium tabular-nums text-emerald-700">
                       {format(payment.amount)}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-3.5">
                       <div className="flex justify-end gap-1">
                         <Button variant="ghost" onClick={() => openEdit(payment)}>
                           {t('common.edit')}
                         </Button>
-                        <Button variant="ghost" onClick={() => setDeleting(payment)}>
+                        <Button variant="dangerGhost" onClick={() => setDeleting(payment)}>
                           {t('common.delete')}
                         </Button>
                       </div>
@@ -185,7 +185,7 @@ export function PaymentsTab({ projectId }: { projectId: string }) {
                   <td colSpan={2} className="px-4 py-3 text-sm font-medium text-slate-600">
                     {t('payments.totalReceived')}
                   </td>
-                  <td className="px-4 py-3 text-end text-sm font-semibold tabular-nums text-slate-900">
+                  <td className="px-5 py-3.5 text-end text-sm font-semibold tabular-nums text-slate-900">
                     {format(totalReceived)}
                   </td>
                   <td />

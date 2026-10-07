@@ -167,7 +167,7 @@ export function SubcontractorPaymentsModal({
         </form>
 
         <div className="border-t border-slate-100 pt-4">
-          <h3 className="text-xs font-medium uppercase tracking-wide text-slate-500">
+          <h3 className="text-[13px] text-slate-500">
             {t('subcontractors.history')}
           </h3>
 

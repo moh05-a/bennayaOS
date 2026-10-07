@@ -164,7 +164,7 @@ export function SubcontractorsTab({ projectId }: { projectId: string }) {
                     </span>
                     <span className="tabular-nums">{paidPercent.toFixed(0)}%</span>
                   </div>
-                  <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-200">
+                  <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100">
                     <div
                       className={`h-full rounded-full transition-all ${
                         isOverpaid ? 'bg-amber-500' : 'bg-slate-700'
@@ -181,7 +181,7 @@ export function SubcontractorsTab({ projectId }: { projectId: string }) {
                   <Button variant="secondary" onClick={() => openEdit(subcontractor)}>
                     {t('common.edit')}
                   </Button>
-                  <Button variant="ghost" onClick={() => setDeleting(subcontractor)}>
+                  <Button variant="dangerGhost" onClick={() => setDeleting(subcontractor)}>
                     {t('common.delete')}
                   </Button>
                 </div>

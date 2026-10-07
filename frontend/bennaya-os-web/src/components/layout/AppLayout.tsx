@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
+import { BrandLogo } from '../BrandMark'
 import { useLanguage } from '../../hooks/useLanguage'
 
 /**
@@ -13,7 +14,7 @@ export function AppLayout() {
   const { t } = useLanguage()
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-canvas">
       <Sidebar isOpen={isSidebarOpen} onNavigate={() => setIsSidebarOpen(false)} />
 
       {/* Top bar with the menu button - hidden once the sidebar is permanent. */}
@@ -28,13 +29,13 @@ export function AppLayout() {
             <path d="M2 5.75A.75.75 0 0 1 2.75 5h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 5.75Zm0 4.5A.75.75 0 0 1 2.75 9.5h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10.25Zm0 4.5a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z" />
           </svg>
         </button>
-        <span className="text-base font-semibold text-slate-900">BennayaOS</span>
+        <BrandLogo />
       </header>
 
-      {/* lg:ps-72 leaves room for the always-visible sidebar on desktop.
+      {/* lg:ps-74 leaves room for the always-visible sidebar on desktop.
           ps/pe (padding-start/end) instead of pl/pr, so the gap follows the
           sidebar to the right-hand side in Arabic. */}
-      <main className="px-4 py-6 sm:px-6 lg:ps-72 lg:pe-8">
+      <main className="px-4 pb-14 pt-6 sm:px-6 lg:pe-10 lg:ps-74 lg:pt-8">
         <Outlet />
       </main>
     </div>

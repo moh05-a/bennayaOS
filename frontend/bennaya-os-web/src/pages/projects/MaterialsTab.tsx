@@ -227,7 +227,7 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
                 </dl>
 
                 <div className="mt-3">
-                  <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+                  <div className="h-2 overflow-hidden rounded-full bg-slate-100">
                     <div
                       className={`h-full rounded-full ${
                         material.isOverSupplied ? 'bg-amber-500' : 'bg-slate-700'
@@ -261,7 +261,7 @@ export function MaterialsTab({ projectId }: { projectId: string }) {
                   <Button variant="secondary" onClick={() => openEdit(material)}>
                     {t('common.edit')}
                   </Button>
-                  <Button variant="ghost" onClick={() => setDeleting(material)}>
+                  <Button variant="dangerGhost" onClick={() => setDeleting(material)}>
                     {t('common.delete')}
                   </Button>
                 </div>

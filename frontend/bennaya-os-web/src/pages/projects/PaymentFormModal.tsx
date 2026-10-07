@@ -11,10 +11,12 @@ import { useCurrency } from '../../hooks/useCurrency'
 import { useLanguage } from '../../hooks/useLanguage'
 import { todayIsoDate } from '../../utils/format'
 import type { ClientPayment } from '../../types/payment'
+import { ProjectSelect } from './ProjectSelect'
 
 interface PaymentFormModalProps {
   isOpen: boolean
-  projectId: string
+  /** null = the user picks the project in the form (dashboard quick add). */
+  projectId: string | null
   payment: ClientPayment | null
   onClose: () => void
 }
@@ -36,8 +38,11 @@ export function PaymentFormModal({ isOpen, projectId, payment, onClose }: Paymen
     date: todayIsoDate(),
     description: '',
   })
+  const [chosenProjectId, setChosenProjectId] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
+
+  const targetProjectId = projectId ?? chosenProjectId
 
   useEffect(() => {
     if (!isOpen) return
@@ -50,6 +55,7 @@ export function PaymentFormModal({ isOpen, projectId, payment, onClose }: Paymen
           }
         : { amount: '', date: todayIsoDate(), description: '' },
     )
+    setChosenProjectId('')
     setFieldErrors({})
     setFormError(null)
   }, [isOpen, payment])
@@ -63,10 +69,10 @@ export function PaymentFormModal({ isOpen, projectId, payment, onClose }: Paymen
       }
       return payment
         ? paymentsApi.update(payment.id, payload)
-        : paymentsApi.create(projectId, payload)
+        : paymentsApi.create(targetProjectId, payload)
     },
     onSuccess: () => {
-      invalidateProjectFinancials(queryClient, projectId)
+      invalidateProjectFinancials(queryClient, targetProjectId)
       onClose()
     },
     onError: (error: unknown) => {
@@ -100,6 +106,10 @@ export function PaymentFormModal({ isOpen, projectId, payment, onClose }: Paymen
       <form onSubmit={handleSubmit} className="space-y-4">
         {formError && <ErrorMessage message={formError} />}
 
+        {projectId === null && (
+          <ProjectSelect value={chosenProjectId} onChange={setChosenProjectId} />
+        )}
+
         <Input
           label={t('payments.amountReceived', { currency: currencyCode })}
           type="number"
@@ -107,7 +117,7 @@ export function PaymentFormModal({ isOpen, projectId, payment, onClose }: Paymen
           min="0"
           inputMode="decimal"
           required
-          autoFocus
+          autoFocus={projectId !== null}
           value={form.amount}
           onChange={update('amount')}
           error={fieldErrors.amount}

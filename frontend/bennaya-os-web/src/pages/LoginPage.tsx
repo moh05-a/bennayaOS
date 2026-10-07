@@ -4,6 +4,7 @@ import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { ErrorMessage } from '../components/ui/ErrorMessage'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
+import { BrandMark } from '../components/BrandMark'
 import { useAuth } from '../hooks/useAuth'
 import { useLanguage } from '../hooks/useLanguage'
 import { ApiError } from '../services/api'
@@ -42,12 +43,15 @@ export function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
+    <div className="relative flex min-h-screen items-center justify-center bg-canvas px-4 py-10">
       <LanguageSwitcher className="absolute end-4 top-4" />
 
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-semibold text-slate-900">BennayaOS</h1>
+          <div className="mb-4 flex justify-center">
+            <BrandMark size={44} />
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">BennayaOS</h1>
           <p className="mt-1 text-sm text-slate-500">{t('auth.signInSubtitle')}</p>
         </div>
 

@@ -234,7 +234,7 @@ export function TasksTab({ projectId }: { projectId: string }) {
                     <Button variant="secondary" onClick={() => openEdit(task)}>
                       {t('common.edit')}
                     </Button>
-                    <Button variant="ghost" onClick={() => setDeleting(task)}>
+                    <Button variant="dangerGhost" onClick={() => setDeleting(task)}>
                       {t('common.delete')}
                     </Button>
                   </div>

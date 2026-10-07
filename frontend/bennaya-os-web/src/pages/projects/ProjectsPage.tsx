@@ -98,15 +98,15 @@ export function ProjectsPage() {
           {/* DESKTOP: table */}
           <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm sm:block">
             <table className="w-full text-start text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+              <thead className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">{t('projects.projectColumn')}</th>
-                  <th className="px-4 py-3 font-medium">{t('projects.clientColumn')}</th>
-                  <th className="px-4 py-3 font-medium">{t('fields.status')}</th>
-                  <th className="px-4 py-3 text-end font-medium">{t('money.contractValue')}</th>
-                  <th className="px-4 py-3 text-end font-medium">{t('money.received')}</th>
-                  <th className="px-4 py-3 text-end font-medium">{t('money.spent')}</th>
-                  <th className="px-4 py-3 text-end font-medium">{t('money.outstanding')}</th>
+                  <th className="px-5 py-3.5 font-medium">{t('projects.projectColumn')}</th>
+                  <th className="px-5 py-3.5 font-medium">{t('projects.clientColumn')}</th>
+                  <th className="px-5 py-3.5 font-medium">{t('fields.status')}</th>
+                  <th className="px-5 py-3.5 text-end font-medium">{t('money.contractValue')}</th>
+                  <th className="px-5 py-3.5 text-end font-medium">{t('money.received')}</th>
+                  <th className="px-5 py-3.5 text-end font-medium">{t('money.spent')}</th>
+                  <th className="px-5 py-3.5 text-end font-medium">{t('money.outstanding')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -116,7 +116,7 @@ export function ProjectsPage() {
                     onClick={() => navigate(`/projects/${project.id}`)}
                     className="cursor-pointer hover:bg-slate-50"
                   >
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-3.5">
                       <Link
                         to={`/projects/${project.id}`}
                         className="font-medium text-slate-900 hover:underline"
@@ -130,14 +130,14 @@ export function ProjectsPage() {
                         <p className="text-xs text-slate-500">{project.location}</p>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{project.clientName}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-3.5 text-slate-600">{project.clientName}</td>
+                    <td className="px-5 py-3.5">
                       <StatusBadge status={project.status} />
                     </td>
-                    <td className="px-4 py-3 text-end font-medium tabular-nums text-slate-900">
+                    <td className="px-5 py-3.5 text-end font-medium tabular-nums text-slate-900">
                       {format(project.contractValue)}
                     </td>
-                    <td className="px-4 py-3 text-end tabular-nums text-emerald-700">
+                    <td className="px-5 py-3.5 text-end tabular-nums text-emerald-700">
                       {format(project.totalReceived)}
                     </td>
                     <td
@@ -149,7 +149,7 @@ export function ProjectsPage() {
                     >
                       {format(project.totalExpenses)}
                     </td>
-                    <td className="px-4 py-3 text-end tabular-nums text-slate-600">
+                    <td className="px-5 py-3.5 text-end tabular-nums text-slate-600">
                       {format(project.outstandingBalance)}
                     </td>
                   </tr>

@@ -129,6 +129,7 @@ public class DashboardService : IDashboardService
             {
                 Id = t.Id,
                 Title = t.Title,
+                Description = t.Description,
                 DueDate = t.DueDate,
                 Status = t.Status.ToString(),
                 IsOverdue = t.DueDate != null && t.DueDate < today,

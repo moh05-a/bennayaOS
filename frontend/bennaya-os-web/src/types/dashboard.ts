@@ -1,5 +1,6 @@
 import type { ExpenseCategory } from './expense'
 import type { ProjectStatus } from './project'
+import type { ProjectTaskStatus } from './task'
 
 export interface StatusCount {
   status: ProjectStatus
@@ -29,8 +30,9 @@ export interface RecentPayment {
 export interface UpcomingTask {
   id: string
   title: string
+  description: string | null
   dueDate: string | null
-  status: string
+  status: ProjectTaskStatus
   /** Decided by the SERVER, so every device agrees on what is late. */
   isOverdue: boolean
   projectId: string

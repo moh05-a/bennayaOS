@@ -1,3 +1,5 @@
+import { MoneyFigure } from './MoneyFigure'
+
 interface StatCardProps {
   label: string
   value: string
@@ -18,10 +20,10 @@ const TONE_CLASSES = {
  */
 export function StatCard({ label, value, hint, tone = 'default' }: StatCardProps) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
-      <p className={`mt-1.5 text-xl font-semibold tabular-nums ${TONE_CLASSES[tone]}`}>{value}</p>
-      {hint && <p className="mt-0.5 text-xs text-slate-500">{hint}</p>}
+    <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+      <p className="text-[13px] text-slate-500">{label}</p>
+      <MoneyFigure value={value} className={`text-2xl ${TONE_CLASSES[tone]}`} />
+      {hint && <p className="text-xs text-slate-500">{hint}</p>}
     </div>
   )
 }

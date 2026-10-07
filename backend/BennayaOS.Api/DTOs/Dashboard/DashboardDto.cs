@@ -47,6 +47,8 @@ public class UpcomingTaskDto
 {
     public required Guid Id { get; init; }
     public required string Title { get; init; }
+    /// <summary>Sent so the dashboard can tick a task done without wiping its notes (PUT replaces the whole task).</summary>
+    public string? Description { get; init; }
     public DateOnly? DueDate { get; init; }
     public required string Status { get; init; }
     public required bool IsOverdue { get; init; }

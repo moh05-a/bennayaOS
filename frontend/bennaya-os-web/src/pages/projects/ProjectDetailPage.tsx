@@ -4,12 +4,15 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Button } from '../../components/ui/Button'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { ErrorMessage } from '../../components/ui/ErrorMessage'
+import { MoneyFigure } from '../../components/ui/MoneyFigure'
+import { ProgressBar } from '../../components/ui/ProgressBar'
 import { Spinner } from '../../components/ui/Spinner'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { projectsApi } from '../../services/projectsApi'
 import { ApiError } from '../../services/api'
 import { useCurrency } from '../../hooks/useCurrency'
 import { useLanguage } from '../../hooks/useLanguage'
+import { projectSchedule } from '../../utils/schedule'
 import { ExpensesTab } from './ExpensesTab'
 import { OverviewTab } from './OverviewTab'
 import { PaymentsTab } from './PaymentsTab'
@@ -81,9 +84,10 @@ export function ProjectDetailPage() {
   }
 
   const activeTabMeta = TABS.find((tab) => tab.id === activeTab)
+  const schedule = projectSchedule(project.startDate, project.expectedEndDate)
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-6xl">
       <Link
         to="/projects"
         className="mb-4 inline-block text-sm text-slate-500 hover:text-slate-900"
@@ -92,80 +96,94 @@ export function ProjectDetailPage() {
       </Link>
 
       {/* HEADER */}
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <div className="flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:px-7 sm:py-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-xl font-semibold text-slate-900">{project.name}</h1>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-[26px]">
+                {project.name}
+              </h1>
               <StatusBadge status={project.status} />
             </div>
 
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1.5 text-sm text-slate-600">
               {project.clientName}
               {project.clientPhone && (
                 <>
                   {' · '}
                   <a
                     href={`tel:${project.clientPhone}`}
-                    className="underline underline-offset-2"
+                    className="underline-offset-2 hover:underline"
                   >
                     <span dir="ltr">{project.clientPhone}</span>
                   </a>
                 </>
               )}
+              {project.location && <> · {project.location}</>}
             </p>
-
-            {project.location && (
-              <p className="mt-0.5 text-sm text-slate-500">{project.location}</p>
-            )}
           </div>
 
           <div className="flex shrink-0 gap-2">
             <Button variant="secondary" onClick={() => navigate(`/projects/${project.id}/edit`)}>
               {t('common.edit')}
             </Button>
-            <Button variant="ghost" onClick={() => setIsConfirmingDelete(true)}>
+            <Button variant="dangerGhost" onClick={() => setIsConfirmingDelete(true)}>
               {t('common.delete')}
             </Button>
           </div>
         </div>
 
-        <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-slate-100 pt-5 sm:grid-cols-3">
-          <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              {t('money.contractValue')}
-            </dt>
-            <dd className="mt-1 text-lg font-semibold tabular-nums text-slate-900">
-              {format(project.contractValue)}
-            </dd>
+        <div className="grid gap-5 border-t border-slate-100 pt-5 sm:grid-cols-[auto_1fr] sm:gap-8">
+          <div className="flex flex-col gap-1">
+            <p className="text-[13px] text-slate-500">{t('money.contractValue')}</p>
+            <MoneyFigure value={format(project.contractValue)} className="text-xl text-slate-900" />
           </div>
-          <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              {t('projects.start')}
-            </dt>
-            <dd className="mt-1 text-sm text-slate-900">{formatDate(project.startDate)}</dd>
+
+          {/* Timeline: start, where today falls, expected end. */}
+          <div className="flex flex-col justify-end gap-2">
+            <div className="flex flex-wrap justify-between gap-x-4 gap-y-1 text-[13px] text-slate-600">
+              <span>
+                {t('projects.start')}{' '}
+                <b className="font-semibold text-slate-900">{formatDate(project.startDate)}</b>
+              </span>
+              {schedule && (
+                <span className="font-semibold text-slate-900">
+                  {schedule.state === 'upcoming'
+                    ? t('projects.startsIn', { count: schedule.daysUntilStart })
+                    : schedule.state === 'overrun'
+                      ? t('projects.daysPastEnd', { count: schedule.daysPastEnd })
+                      : `${t('projects.dayOf', { day: schedule.day, total: schedule.totalDays })} · ${t('projects.daysLeft', { count: schedule.daysLeft })}`}
+                </span>
+              )}
+              <span>
+                {t('projects.expectedEnd')}{' '}
+                <b className="font-semibold text-slate-900">
+                  {formatDate(project.expectedEndDate)}
+                </b>
+              </span>
+            </div>
+            {schedule && (
+              <ProgressBar
+                percent={schedule.elapsedPercent}
+                colorClass={schedule.state === 'overrun' ? 'bg-red-500' : 'bg-slate-900'}
+              />
+            )}
           </div>
-          <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              {t('projects.expectedEnd')}
-            </dt>
-            <dd className="mt-1 text-sm text-slate-900">{formatDate(project.expectedEndDate)}</dd>
-          </div>
-        </dl>
+        </div>
       </div>
 
       {/* TABS - horizontally scrollable on phones rather than wrapping badly */}
       <div className="mt-6 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-        <div className="flex min-w-max gap-1 border-b border-slate-200">
+        <div className="flex min-w-max gap-0.5 border-b border-slate-200">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition ${
+              className={`-mb-px whitespace-nowrap border-b-2 px-3.5 py-3 text-sm transition ${
                 activeTab === tab.id
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
+                  ? 'border-slate-900 font-semibold text-slate-900'
+                  : 'border-transparent font-medium text-slate-500 hover:text-slate-900'
               }`}
             >
               {t(`projects.tabs.${tab.id}`)}

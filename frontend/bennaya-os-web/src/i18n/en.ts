@@ -35,6 +35,8 @@ export const en = {
     description: 'Description',
     supplier: 'Supplier',
     status: 'Status',
+    project: 'Project',
+    selectProject: 'Select a project',
   },
 
   errors: {
@@ -49,6 +51,7 @@ export const en = {
   },
 
   nav: {
+    workspace: 'Contractor workspace',
     dashboard: 'Dashboard',
     projects: 'Projects',
     clients: 'Clients',
@@ -153,6 +156,7 @@ export const en = {
   },
 
   dashboard: {
+    collectedOfContract: '{percent} of contract value collected',
     loading: 'Loading dashboard',
     loadError: 'Could not load your dashboard.',
     welcome: 'Welcome, {name}',
@@ -181,6 +185,10 @@ export const en = {
     overdueOn: 'Overdue · {date}',
     noDueDate: 'No due date',
     footnote: 'Money totals and tasks exclude cancelled projects.',
+    quickExpense: '+ Expense',
+    quickPayment: '+ Payment',
+    markDone: 'Mark "{title}" as done',
+    taskUpdateError: 'Could not update the task. Please try again.',
   },
 
   clients: {
@@ -225,6 +233,19 @@ export const en = {
   },
 
   projects: {
+    dayOf: 'Day {day} of {total}',
+    daysLeft: {
+      one: '{count} day left',
+      other: '{count} days left',
+    },
+    startsIn: {
+      one: 'Starts in {count} day',
+      other: 'Starts in {count} days',
+    },
+    daysPastEnd: {
+      one: '{count} day past expected end',
+      other: '{count} days past expected end',
+    },
     title: 'Projects',
     description: 'Every job you are running.',
     new: 'New project',
@@ -275,6 +296,7 @@ export const en = {
   },
 
   overview: {
+    scheduleElapsed: 'Schedule elapsed',
     inclSubcontractors: 'incl. {amount} to subcontractors',
     netCashHint:
       'Received minus spent. This is cash, not profit — it excludes work you have done but not yet invoiced, and costs you have committed but not yet paid.',
