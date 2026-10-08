@@ -49,7 +49,7 @@ export function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
           <div className="mb-4 flex justify-center">
-            <BrandMark size={44} />
+            <BrandMark size={96} variant="full" />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900">BennayaOS</h1>
           <p className="mt-1 text-sm text-slate-500">{t('auth.signInSubtitle')}</p>
