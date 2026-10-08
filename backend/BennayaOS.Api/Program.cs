@@ -84,9 +84,15 @@ builder.Services.AddProblemDetails();
 // (localhost:5160) unless the API explicitly allows that origin.
 const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
-var allowedOrigins = builder.Configuration
-    .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>() ?? [];
+// Browsers send the origin as "https://host" with no trailing slash, and the
+// match is exact - so stray quotes, spaces or a "/" pasted into a hosting
+// dashboard would silently block the frontend. Normalise them away.
+var allowedOrigins = (builder.Configuration
+        .GetSection("Cors:AllowedOrigins")
+        .Get<string[]>() ?? [])
+    .Select(origin => origin.Trim().Trim('"', '\'').Trim().TrimEnd('/'))
+    .Where(origin => origin.Length > 0)
+    .ToArray();
 
 builder.Services.AddCors(options =>
 {
@@ -120,6 +126,12 @@ builder.Services.AddCleanValidationResponses();
 builder.Services.AddAppLocalization();
 
 var app = builder.Build();
+
+// Shown in the hosting logs at startup, so a CORS misconfiguration is visible
+// without guessing. Origins are public URLs, not secrets.
+app.Logger.LogInformation(
+    "CORS allowed origins: {Origins}",
+    allowedOrigins.Length > 0 ? string.Join(", ", allowedOrigins) : "(none)");
 
 // ---------------------------------------------------------------------------
 // 8. HTTP pipeline (order matters - each piece wraps the next)
